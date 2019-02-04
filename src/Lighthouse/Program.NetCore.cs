@@ -2,9 +2,8 @@
 
 namespace Lighthouse
 {
-    public partial class Program
+    public class Program
     {
-#if NETCOREAPP1_1
         public static void Main(string[] args)
         {
             var lighthouseService = new LighthouseService();
@@ -16,6 +15,5 @@ namespace Lighthouse
             };
             lighthouseService.TerminationHandle.Wait(); 
         }
-#endif
     }
 }

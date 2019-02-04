@@ -1,13 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\common.props" />
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>$(NetCoreVersion)</TargetFramework>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="crawler.hocon" />
-  </ItemGroup>
 
   <ItemGroup>
     <Content Include="crawler.hocon">
@@ -16,8 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Akka.Bootstrap.Docker" Version="0.1.3" />
-    <PackageReference Include="Akka.Cluster" Version="1.3.10" />
+    <PackageReference Include="Akka.Bootstrap.Docker" Version="$(AkkaBootstrapVersion)" />
+    <PackageReference Include="Akka.Cluster" Version="$(AkkaVersion)" />
+    <PackageReference Include="Akka.Cluster.HealthCheck" Version="$(AkkaHealthCheckVersion)" />
   </ItemGroup>
 
   <ItemGroup>
