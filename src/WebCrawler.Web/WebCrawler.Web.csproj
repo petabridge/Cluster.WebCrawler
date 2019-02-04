@@ -13,11 +13,8 @@
     <PackageReference Include="Akka.Bootstrap.Docker" Version="$(AkkaBootstrapVersion)" />
     <PackageReference Include="Akka.Cluster" Version="$(AkkaVersion)" />
     <PackageReference Include="Akka.Cluster.HealthCheck" Version="$(AkkaHealthCheckVersion)" />
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.6" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.0.4" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WebCrawler.Shared\WebCrawler.Shared.csproj" />
