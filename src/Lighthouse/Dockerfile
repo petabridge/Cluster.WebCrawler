@@ -1,21 +1,29 @@
-FROM microsoft/dotnet:1.1-sdk AS build-env
+FROM microsoft/dotnet:2.0-runtime AS base
 WORKDIR /app
-
-ENV ACTORSYSTEM "lighthouse"
 
 # should be a comma-delimited list
-ENV SEEDS "[]"
+ENV CLUSTER_SEEDS "[]"
+ENV CLUSTER_IP ""
+ENV CLUSTER_PORT "4053"
 
-COPY src/Lighthouse/*.csproj ./
+FROM microsoft/dotnet:2.0-sdk AS build
+WORKDIR /src
+COPY *.sln ./
+COPY ./get-dockerip.sh ./get-dockerip.sh
+COPY src/Lighthouse/Lighthouse.csproj src/Lighthouse/
+
 RUN dotnet restore
+COPY . .
+WORKDIR /src/src/Lighthouse
+RUN dotnet build -c Release -o /app
 
-COPY src/Lighthouse ./
-RUN dotnet publish -c Release --framework netcoreapp1.1 -o out
+FROM build AS publish
+RUN dotnet publish -c Release -o /app
 
-FROM microsoft/dotnet:1.1-runtime AS runtime
+FROM base AS final
 WORKDIR /app
-COPY --from=build-env /app/out ./
-COPY --from=build-env /app/get-dockerip.sh ./get-dockerip.sh
+COPY --from=publish /app ./
+COPY --from=build /src/get-dockerip.sh ./get-dockerip.sh
 ENTRYPOINT ["/bin/bash","get-dockerip.sh"]
 
 # 9110 - Petabridge.Cmd
