@@ -299,6 +299,8 @@ Target "BuildDockerImages" (fun _ ->
                 |> append "build"
                 |> append "-t"
                 |> append (imageName + ":" + releaseNotes.AssemblyVersion) 
+                |> append "-t"
+                |> append (imageName + ":latest") 
                 |> append "."
                 |> toText
 
@@ -359,6 +361,7 @@ Target "Help" <| fun _ ->
 Target "BuildRelease" DoNothing
 Target "All" DoNothing
 Target "Nuget" DoNothing
+Target "Docker" DoNothing
 
 // build dependencies
 "Clean" ==> "RestorePackages" ==> "AssemblyInfo" ==> "Build" ==> "BuildRelease"
@@ -372,6 +375,9 @@ Target "Nuget" DoNothing
 
 // docs
 "Clean" ==> "RestorePackages" ==> "BuildRelease" ==> "Docfx"
+
+// Docker
+"Clean" ==> "PublishCode" ==> "BuildDockerImages" ==> "Docker"
 
 // all
 "BuildRelease" ==> "All"
