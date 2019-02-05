@@ -260,6 +260,65 @@ Target "DocFx" (fun _ ->
 )
 
 //--------------------------------------------------------------------------------
+// Docker Targets
+//-------------------------------------------------------------------------------- 
+Target "PublishCode" (fun _ ->    
+    let projects = !! "src/**/*.csproj" 
+                   -- "src/WebCrawler.Shared/*.csproj"
+                   -- "src/WebCrawler.Shared.*/*.csproj"
+                   -- "src/**/*Tests.csproj" // Don't publish unit tests
+                   -- "src/**/*Tests*.csproj"
+
+    let runSingleProject project =
+        DotNetCli.Publish
+            (fun p -> 
+                { p with
+                    Project = project
+                    Configuration = configuration
+                    VersionSuffix = overrideVersionSuffix project
+                    })
+
+    projects |> Seq.iter (runSingleProject)
+)
+
+let mapDockerImageName (projectName:string) =
+    match projectName with
+    | "Lighthouse" -> Some("webcrawler.lighthouse")
+    | "WebCrawler.CrawlService" -> Some("webcrawler.crawlservice")
+    | "WebCrawler.TrackerService" -> Some("webcrawler.trackerservice")
+    | "WebCrawler.Web" -> Some("webcrawler.web")
+    | _ -> None
+
+Target "BuildDockerImages" (fun _ ->
+    let projects = !! "src/**/*.csproj" 
+                   -- "src/**/*Tests.csproj" // Don't publish unit tests
+                   -- "src/**/*Tests*.csproj"
+    
+    let buildDockerImage imageName projectPath =
+        let args = StringBuilder()
+                |> append "build"
+                |> append "-t"
+                |> append (imageName + ":" + releaseNotes.AssemblyVersion) 
+                |> append "."
+                |> toText
+
+        ExecProcess(fun info -> 
+                info.FileName <- "docker"
+                info.WorkingDirectory <- Path.GetDirectoryName projectPath
+                info.Arguments <- args) (System.TimeSpan.FromMinutes 5.0) (* Reasonably long-running task. *)
+
+    let runSingleProject project =
+        let projectName = Path.GetFileNameWithoutExtension project
+        let imageName = mapDockerImageName projectName
+        let result = match imageName with
+                        | None -> 0
+                        | Some(name) -> buildDockerImage name project
+        if result <> 0 then failwithf "docker build failed. %s" project
+
+    projects |> Seq.iter (runSingleProject)
+)
+
+//--------------------------------------------------------------------------------
 // Cleanup
 //--------------------------------------------------------------------------------
 
