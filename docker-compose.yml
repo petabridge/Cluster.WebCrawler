@@ -4,7 +4,6 @@ services:
   lighthouse:
     image: webcrawler.lighthouse
     build:
-      context: .
       dockerfile: src/Lighthouse/Dockerfile
     ports:
       - '9110:9110'
@@ -19,7 +18,6 @@ services:
   webcrawler.web:
     image: webcrawler.web
     build:
-      context: .
       dockerfile: src/WebCrawler.Web/Dockerfile
     ports:
       - '8080:80'
@@ -33,7 +31,6 @@ services:
   webcrawler.crawlservice:
     image: webcrawler.crawlservice
     build:
-      context: .
       dockerfile: src/WebCrawler.CrawlService/Dockerfile
     environment:
       CLUSTER_SEEDS: "akka.tcp://webcrawler@lighthouse:4053"
@@ -45,7 +42,6 @@ services:
   webcrawler.trackerservice:
     image: webcrawler.trackerservice
     build:
-      context: .
       dockerfile: src/WebCrawler.TrackerService/Dockerfile
     environment:
       CLUSTER_SEEDS: "akka.tcp://webcrawler@lighthouse:4053"
