@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Net;
 using Akka.Actor;
 using Akka.Configuration;
 using ConfigurationException = Akka.Configuration.ConfigurationException;
@@ -38,7 +39,7 @@ namespace Lighthouse
             if (string.IsNullOrEmpty(ipAddress))
             {
                 ipAddress = remoteConfig.GetString("dot-netty.tcp.public-hostname") ??
-                            "127.0.0.1"; //localhost as a final default
+                            Dns.GetHostName(); // locally assigned hostname as the final default
             }
            
             int port = specifiedPort ?? remoteConfig.GetInt("dot-netty.tcp.port");
