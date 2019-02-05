@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using Akka.Actor;
+using Akka.Bootstrap.Docker;
 using Akka.Configuration;
 using ConfigurationException = Akka.Configuration.ConfigurationException;
 
@@ -13,20 +14,12 @@ namespace Lighthouse
     /// </summary>
     public static class LighthouseHostFactory
     {
-        public static ActorSystem LaunchLighthouse(string ipAddress = null, int? specifiedPort = null, string systemName = null)
+        public static ActorSystem LaunchLighthouse()
         {
-            systemName = systemName ?? Environment.GetEnvironmentVariable("ACTORSYSTEM")?.Trim();
-            ipAddress = ipAddress ?? Environment.GetEnvironmentVariable("CLUSTER_IP")?.Trim();
-            if (specifiedPort == null)
-            {
-                var envPort = Environment.GetEnvironmentVariable("CLUSTER_PORT")?.Trim();
-                if (!string.IsNullOrEmpty(envPort) && int.TryParse(envPort, out var actualPort))
-                {
-                    specifiedPort = actualPort;
-                }
-            }
+            var systemName = Environment.GetEnvironmentVariable("ACTORSYSTEM")?.Trim();
 
-            var clusterConfig = ConfigurationFactory.ParseString(File.ReadAllText("akka.hocon"));
+            var clusterConfig = ConfigurationFactory.ParseString(File.ReadAllText("akka.hocon"))
+                .BootstrapFromDocker();
 
             var lighthouseConfig = clusterConfig.GetConfig("lighthouse");
             if (lighthouseConfig != null && string.IsNullOrEmpty(systemName))
@@ -34,17 +27,8 @@ namespace Lighthouse
                 systemName = lighthouseConfig.GetString("actorsystem", systemName);
             }
 
-            var remoteConfig = clusterConfig.GetConfig("akka.remote");
-
-            if (string.IsNullOrEmpty(ipAddress))
-            {
-                ipAddress = remoteConfig.GetString("dot-netty.tcp.public-hostname") ??
-                            Dns.GetHostName(); // locally assigned hostname as the final default
-            }
-           
-            int port = specifiedPort ?? remoteConfig.GetInt("dot-netty.tcp.port");
-
-            if (port == 0) throw new ConfigurationException("Need to specify an explicit port for Lighthouse. Found an undefined port or a port value of 0 in App.config.");
+            var ipAddress = clusterConfig.GetString("akka.remote.dot-netty.tcp.public-hostname");
+            var port = clusterConfig.GetInt("akka.remote.dot-netty.tcp.port");
 
             var selfAddress = $"akka.tcp://{systemName}@{ipAddress}:{port}";
 
@@ -56,32 +40,31 @@ namespace Lighthouse
             selfAddress = new Address("akka.tcp", systemName, ipAddress.Trim(), port).ToString();
             Console.WriteLine("[Lighthouse] Parse successful.");
 
-            var clusterSeeds = Environment.GetEnvironmentVariable("CLUSTER_SEEDS")?.Trim();
 
-            var seeds = clusterConfig.GetStringList("akka.cluster.seed-nodes");
-            if (!string.IsNullOrEmpty(clusterSeeds))
+            var seeds = clusterConfig.GetStringList("akka.cluster.seed-nodes").ToList();
+
+            Config injectedClusterConfigString = null;
+
+
+            if (!seeds.Contains(selfAddress))
             {
-                var tempSeeds = clusterSeeds.Trim('[', ']').Split(',');
-                if (tempSeeds.Any())
+                seeds.Add(selfAddress);
+
+                if (seeds.Count > 1)
                 {
-                    seeds = tempSeeds;
+                    injectedClusterConfigString = seeds.Aggregate("akka.cluster.seed-nodes = [", (current, seed) => current + (@"""" + seed + @""", "));
+                    injectedClusterConfigString += "]";
+                }
+                else
+                {
+                    injectedClusterConfigString = "akka.cluster.seed-nodes = [\""+ selfAddress +"\"]";
                 }
             }
 
            
-            if (!seeds.Contains(selfAddress))
-            {
-                seeds.Add(selfAddress);
-            }
 
-            var injectedClusterConfigString = seeds.Aggregate("akka.cluster.seed-nodes = [", (current, seed) => current + (@"""" + seed + @""", "));
-            injectedClusterConfigString += "]";
-
-            var finalConfig = ConfigurationFactory.ParseString(
-                string.Format(@"akka.remote.dot-netty.tcp.public-hostname = {0} 
-akka.remote.dot-netty.tcp.port = {1}", ipAddress, port))
-                .WithFallback(ConfigurationFactory.ParseString(injectedClusterConfigString))
-                .WithFallback(clusterConfig);
+            var finalConfig = injectedClusterConfigString != null ? injectedClusterConfigString
+                .WithFallback(clusterConfig) : clusterConfig;
 
             return ActorSystem.Create(systemName, finalConfig);
         }

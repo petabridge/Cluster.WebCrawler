@@ -22,24 +22,11 @@ namespace Lighthouse
 {
     public class LighthouseService
     {
-        private readonly string _ipAddress;
-        private readonly int? _port;
-        private readonly string _actorSystemName;
-
         private ActorSystem _lighthouseSystem;
-
-        public LighthouseService() : this(null, null, null) { }
-
-        public LighthouseService(string ipAddress, int? port, string actorSystemName)
-        {
-            _ipAddress = ipAddress;
-            _port = port;
-            _actorSystemName = actorSystemName;
-        }
 
         public void Start()
         {
-            _lighthouseSystem = LighthouseHostFactory.LaunchLighthouse(_ipAddress, _port, _actorSystemName);
+            _lighthouseSystem = LighthouseHostFactory.LaunchLighthouse();
             var pbm = PetabridgeCmd.Get(_lighthouseSystem);
             pbm.RegisterCommandPalette(ClusterCommands.Instance); // enable cluster management commands
             pbm.Start();
