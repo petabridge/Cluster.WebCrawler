@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: lighthouse
+  labels:
+    app: lighthouse
+spec:
+  clusterIP: None
+  ports:
+  - port: 4053
+  selector:
+    app: lighthouse
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: lighthouse
+  labels:
+    app: lighthouse
+spec:
+  serviceName: lighthouse
+  replicas: 3
+  selector:
+    matchLabels:
+      app: lighthouse
+  template:
+    metadata:
+      labels:
+        app: lighthouse
+    spec:
+      terminationGracePeriodSeconds: 35
+      containers:
+      - name: lighthouse
+        image: webcrawler.lighthouse:latest
+        env:
+        - name: CLUSTER_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: CLUSTER_SEEDS
+          value: akka.tcp://webcrawler@lighthouse-0.lighthouse:4053,akka.tcp://webcrawler@lighthouse-1.lighthouse:4053,akka.tcp://webcrawler@lighthouse-2.lighthouse:4053
+        livenessProbe:
+          tcpSocket:
+            port: 4053
+        ports:
+        - containerPort: 4053
+          protocol: TCP
