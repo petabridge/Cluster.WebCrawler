@@ -31,7 +31,7 @@ spec:
       terminationGracePeriodSeconds: 35
       containers:
       - name: lighthouse
-        image: webcrawler.lighthouse:0.1.0
+        image: webcrawler.lighthouse:0.2.0
         env:
         - name: ACTORSYSTEM
           value: webcrawler
