@@ -31,14 +31,17 @@ spec:
       terminationGracePeriodSeconds: 35
       containers:
       - name: lighthouse
-        image: webcrawler.lighthouse:latest
+        image: webcrawler.lighthouse:0.1.0
         env:
-        - name: CLUSTER_IP
+        - name: ACTORSYSTEM
+          value: webcrawler
+        - name: POD_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
         - name: CLUSTER_SEEDS
           value: akka.tcp://webcrawler@lighthouse-0.lighthouse:4053,akka.tcp://webcrawler@lighthouse-1.lighthouse:4053,akka.tcp://webcrawler@lighthouse-2.lighthouse:4053
+        command: [ "/bin/sh", "-c", "CLUSTER_IP=${POD_NAME}.lighthouse dotnet Lighthouse.dll"]
         livenessProbe:
           tcpSocket:
             port: 4053
