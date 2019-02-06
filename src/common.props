@@ -1,9 +1,9 @@
 <Project>
   <PropertyGroup>
-    <Copyright>Copyright © 2015-2018 Petabridge, LLC</Copyright>
+    <Copyright>Copyright © 2015-2019 Petabridge, LLC</Copyright>
     <Authors>Petabridge</Authors>
-    <VersionPrefix>0.1.0</VersionPrefix>
-    <PackageReleaseNotes>First release</PackageReleaseNotes>
+    <VersionPrefix>0.2.0</VersionPrefix>
+    <PackageReleaseNotes>Upgraded to .NET Core 2.1 for all services.</PackageReleaseNotes>
     <PackageIconUrl>
     </PackageIconUrl>
     <PackageProjectUrl>
@@ -18,6 +18,6 @@
     <AkkaBootstrapVersion>0.2.0</AkkaBootstrapVersion>
     <AkkaHealthCheckVersion>0.1.0</AkkaHealthCheckVersion>
     <PetabridgeCmdVersion>0.4.1</PetabridgeCmdVersion>
-    <NetCoreVersion>netcoreapp2.0</NetCoreVersion>
+    <NetCoreVersion>netcoreapp2.1</NetCoreVersion>
   </PropertyGroup>
 </Project>
