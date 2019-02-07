@@ -6,11 +6,13 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Akka.Cluster" Version="$(AkkaVersion)" />
-    <PackageReference Include="Akka.Cluster.HealthCheck" Version="$(AkkaHealthCheckVersion)" />
-    <PackageReference Include="Akka.Bootstrap.Docker" Version="$(AkkaBootstrapVersion)" />
+
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="1.1.2" />
-    <PackageReference Include="Petabridge.Cmd.Cluster" Version="$(PetabridgeCmdVersion)" />
+    
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WebCrawler.Shared.DevOps\WebCrawler.Shared.DevOps.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="akka.hocon">

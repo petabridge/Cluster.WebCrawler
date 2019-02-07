@@ -31,7 +31,11 @@ spec:
       terminationGracePeriodSeconds: 35
       containers:
       - name: crawler
-        image: webcrawler.crawlservice:0.2.1
+        image: webcrawler.crawlservice:0.2.2
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "pbm 127.0.0.1:9110 cluster leave"]
         env:
         - name: POD_NAME
           valueFrom:

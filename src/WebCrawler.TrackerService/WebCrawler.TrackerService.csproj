@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\WebCrawler.Shared.DevOps\WebCrawler.Shared.DevOps.csproj" />
     <ProjectReference Include="..\WebCrawler.Shared.IO\WebCrawler.Shared.IO.csproj" />
     <ProjectReference Include="..\WebCrawler.Shared\WebCrawler.Shared.csproj" />
   </ItemGroup>

@@ -27,9 +27,6 @@ namespace Lighthouse
         public void Start()
         {
             _lighthouseSystem = LighthouseHostFactory.LaunchLighthouse();
-            var pbm = PetabridgeCmd.Get(_lighthouseSystem);
-            pbm.RegisterCommandPalette(ClusterCommands.Instance); // enable cluster management commands
-            pbm.Start();
         }
 
         /// <summary>

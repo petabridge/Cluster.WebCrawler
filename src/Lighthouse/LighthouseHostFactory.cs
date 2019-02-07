@@ -5,6 +5,7 @@ using System.Net;
 using Akka.Actor;
 using Akka.Bootstrap.Docker;
 using Akka.Configuration;
+using WebCrawler.Shared.DevOps;
 using ConfigurationException = Akka.Configuration.ConfigurationException;
 
 namespace Lighthouse
@@ -18,8 +19,7 @@ namespace Lighthouse
         {
             var systemName = Environment.GetEnvironmentVariable("ACTORSYSTEM")?.Trim();
 
-            var clusterConfig = ConfigurationFactory.ParseString(File.ReadAllText("akka.hocon"))
-                .BootstrapFromDocker();
+            var clusterConfig = ConfigurationFactory.ParseString(File.ReadAllText("akka.hocon")).ApplyOpsConfig();
 
             var lighthouseConfig = clusterConfig.GetConfig("lighthouse");
             if (lighthouseConfig != null && string.IsNullOrEmpty(systemName))
@@ -66,7 +66,8 @@ namespace Lighthouse
             var finalConfig = injectedClusterConfigString != null ? injectedClusterConfigString
                 .WithFallback(clusterConfig) : clusterConfig;
 
-            return ActorSystem.Create(systemName, finalConfig);
+            return ActorSystem.Create(systemName, finalConfig)
+                .StartPbm();
         }
     }
 }
