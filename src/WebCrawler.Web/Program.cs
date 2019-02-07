@@ -20,7 +20,7 @@ namespace WebCrawler.Web
 
             Console.CancelKeyPress += async (sender, eventArgs) =>
             {
-                var wait = CoordinatedShutdown.Get(SystemActors.ActorSystem).Run();
+                var wait = CoordinatedShutdown.Get(SystemActors.ActorSystem).Run(CoordinatedShutdown.ClrExitReason.Instance);
                 await host.StopAsync(TimeSpan.FromSeconds(10));
                 await wait;
             };

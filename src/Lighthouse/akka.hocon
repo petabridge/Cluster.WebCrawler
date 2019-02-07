@@ -13,6 +13,7 @@ petabridge.cmd{
 }
 
 akka {
+  coordinated-shutdown.exit-clr = on
   actor {
     provider = cluster
   }

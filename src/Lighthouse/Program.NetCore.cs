@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Lighthouse
 {
@@ -9,6 +10,12 @@ namespace Lighthouse
             var lighthouseService = new LighthouseService();
             lighthouseService.Start();
             Console.WriteLine("Press Control + C to terminate.");
+
+            AppDomain.CurrentDomain.ProcessExit += async (sender, eventArgs) =>
+            {
+                await lighthouseService.StopAsync();
+            };
+
             Console.CancelKeyPress += async (sender, eventArgs) =>
             {
                 await lighthouseService.StopAsync();

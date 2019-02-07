@@ -1,55 +1,54 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: lighthouse
+  name: web-cluster
   labels:
-    app: lighthouse
+    app: web-cluster
 spec:
   clusterIP: None
   ports:
-  - port: 4053
+  - port: 16666
   selector:
-    app: lighthouse
+    app: web-cluster
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: lighthouse
+  name: web-cluster
   labels:
-    app: lighthouse
+    app: web-cluster
 spec:
-  serviceName: lighthouse
+  serviceName: web-cluster
   replicas: 3
   selector:
     matchLabels:
-      app: lighthouse
+      app: web-cluster
   template:
     metadata:
       labels:
-        app: lighthouse
+        app: web-cluster
     spec:
       terminationGracePeriodSeconds: 35
       containers:
-      - name: lighthouse
-        image: webcrawler.lighthouse:0.2.1
-        lifecycle:
-          preStop:
-            exec:
-              command: ["/bin/sh", "-c", "pbm 127.0.0.1:9110 cluster leave"]
+      - name: web-cluster
+        image: webcrawler.web:0.2.1
         env:
-        - name: ACTORSYSTEM
-          value: webcrawler
         - name: POD_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
         - name: CLUSTER_IP
-          value: "$(POD_NAME).lighthouse"
+          value: "$(POD_NAME).web-cluster"
         - name: CLUSTER_SEEDS
           value: akka.tcp://webcrawler@lighthouse-0.lighthouse:4053,akka.tcp://webcrawler@lighthouse-1.lighthouse:4053,akka.tcp://webcrawler@lighthouse-2.lighthouse:4053
         livenessProbe:
           tcpSocket:
-            port: 4053
+            port: 16666
+        readinessProbe:
+          tcpSocket: 
+            port: 80    
         ports:
-        - containerPort: 4053
+        - containerPort: 16666
+          protocol: TCP
+        - containerPort: 80
           protocol: TCP

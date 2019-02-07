@@ -15,9 +15,14 @@ namespace WebCrawler.TrackerService
             var trackingService = new TrackerService();
             trackingService.Start();
 
-            Console.CancelKeyPress += (sender, eventArgs) =>
+            AppDomain.CurrentDomain.ProcessExit += (sender, eventArgs) =>
             {
-                trackingService.Stop();
+                trackingService.Stop().Wait(TimeSpan.FromSeconds(30));
+            };
+
+            Console.CancelKeyPress += async (sender, eventArgs) =>
+            {
+                await trackingService.Stop();
                 eventArgs.Cancel = true;
             };
 

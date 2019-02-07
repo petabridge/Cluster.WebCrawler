@@ -22,9 +22,9 @@ namespace WebCrawler.CrawlService
             return true;
         }
 
-        public Task Stop()
+        public async Task Stop()
         {
-            return CoordinatedShutdown.Get(ClusterSystem).Run(CoordinatedShutdown.ClrExitReason.Instance);
+            await CoordinatedShutdown.Get(ClusterSystem).Run(CoordinatedShutdown.ClrExitReason.Instance);
         }
     }
 }
