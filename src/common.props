@@ -13,7 +13,7 @@
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
-    <XunitVersion>2.3.1</XunitVersion>
+    <XunitVersion>2.4.1</XunitVersion>
     <AkkaVersion>1.3.11</AkkaVersion>
     <AkkaBootstrapVersion>0.2.0</AkkaBootstrapVersion>
     <AkkaHealthCheckVersion>0.1.0</AkkaHealthCheckVersion>
