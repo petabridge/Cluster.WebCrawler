@@ -31,12 +31,14 @@ spec:
       terminationGracePeriodSeconds: 35
       containers:
       - name: tracker
-        image: webcrawler.tracker:0.2.1
+        image: webcrawler.trackerservice:0.2.1
         env:
-        - name: CLUSTER_IP
+        - name: POD_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
+        - name: CLUSTER_IP
+          value: "$(POD_NAME).tracker"
         - name: CLUSTER_SEEDS
           value: akka.tcp://webcrawler@lighthouse-0.lighthouse:4053,akka.tcp://webcrawler@lighthouse-1.lighthouse:4053,akka.tcp://webcrawler@lighthouse-2.lighthouse:4053
         livenessProbe:

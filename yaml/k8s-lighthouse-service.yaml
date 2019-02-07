@@ -32,9 +32,10 @@ spec:
       containers:
       - name: lighthouse
         image: webcrawler.lighthouse:0.2.1
-        preStop:
-          exec:
-            command: ["/bin/sh", "-c", "pbm 127.0.0.1:9110 cluster leave"]
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "pbm 127.0.0.1:9110 cluster leave"]
         env:
         - name: ACTORSYSTEM
           value: webcrawler
@@ -42,9 +43,10 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
+        - name: CLUSTER_IP
+          value: "$(POD_NAME).tracker"
         - name: CLUSTER_SEEDS
           value: akka.tcp://webcrawler@lighthouse-0.lighthouse:4053,akka.tcp://webcrawler@lighthouse-1.lighthouse:4053,akka.tcp://webcrawler@lighthouse-2.lighthouse:4053
-        command: [ "/bin/sh", "-c", "CLUSTER_IP=${POD_NAME}.lighthouse dotnet Lighthouse.dll"]
         livenessProbe:
           tcpSocket:
             port: 4053
