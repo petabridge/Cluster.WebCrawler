@@ -31,9 +31,9 @@ namespace WebCrawler.TrackerService
             return true;
         }
 
-        public Task Stop()
+        public async Task Stop()
         {
-            return CoordinatedShutdown.Get(ClusterSystem).Run();
+            await CoordinatedShutdown.Get(ClusterSystem).Run(CoordinatedShutdown.ClrExitReason.Instance);
         }
     }
 }
