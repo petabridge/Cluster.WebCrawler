@@ -9,9 +9,14 @@ namespace WebCrawler.CrawlService
             var crawlerService = new CrawlerService();
             crawlerService.Start();
 
-            Console.CancelKeyPress += (sender, eventArgs) =>
+            AppDomain.CurrentDomain.ProcessExit += (sender, eventArgs) =>
             {
-                crawlerService.Stop();
+                crawlerService.Stop().Wait(TimeSpan.FromSeconds(30));
+            };
+
+            Console.CancelKeyPress += async (sender, eventArgs) =>
+            {
+                await crawlerService.Stop();
                 eventArgs.Cancel = true;
             };
 
