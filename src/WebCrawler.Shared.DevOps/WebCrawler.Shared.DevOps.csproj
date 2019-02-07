@@ -6,9 +6,11 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Config\crawler.DevOps.conf" />
+    <None Remove="Config\crawler.Phobos.conf" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Config\crawler.DevOps.conf" />
+    <EmbeddedResource Include="Config\crawler.Phobos.conf" />
   </ItemGroup>
 
   <ItemGroup>

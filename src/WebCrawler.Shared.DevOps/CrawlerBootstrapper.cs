@@ -16,7 +16,18 @@ namespace WebCrawler.Shared.DevOps
         public static Akka.Configuration.Config ApplyOpsConfig(this Akka.Configuration.Config previousConfig)
         {
             var nextConfig = previousConfig.BootstrapFromDocker();
-            return OpsConfig.GetOpsConfig().WithFallback(nextConfig);
+            return OpsConfig.GetOpsConfig().ApplyPhobosConfig().WithFallback(nextConfig);
+        }
+
+        public static Akka.Configuration.Config ApplyPhobosConfig(this Akka.Configuration.Config previousConfig)
+        {
+            var enabledPhobosStr = Environment.GetEnvironmentVariable(OpsConfig.PHOBOS_ENABLED)?.Trim().ToLowerInvariant() ?? "false";
+            if (bool.TryParse(enabledPhobosStr, out var enabledPhobos) && enabledPhobos)
+            {
+                return OpsConfig.GetPhobosConfig().WithFallback(previousConfig);
+            }
+
+            return previousConfig;
         }
 
         /// <summary>

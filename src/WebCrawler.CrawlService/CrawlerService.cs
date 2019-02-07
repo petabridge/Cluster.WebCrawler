@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.Bootstrap.Docker;
 using WebCrawler.Shared.Config;
+using WebCrawler.Shared.DevOps;
 
 namespace WebCrawler.CrawlService
 {
@@ -18,7 +19,7 @@ namespace WebCrawler.CrawlService
         public bool Start()
         {
             var config = HoconLoader.ParseConfig("crawler.hocon");
-            ClusterSystem = ActorSystem.Create("webcrawler", config.BootstrapFromDocker());
+            ClusterSystem = ActorSystem.Create("webcrawler", config.ApplyOpsConfig()).StartPbm();
             return true;
         }
 

@@ -54,6 +54,15 @@ Target "Clean" (fun _ ->
     CleanDir "docs/_site"
 )
 
+(*
+
+    Creates an environment variable that can be read by other processes afterwards for deployments and such
+
+*)
+Target "SetReleaseVersion" (fun _ ->
+    setEnvironVar "RELEASE_NUMBER" releaseNotes.AssemblyVersion 
+)
+
 Target "AssemblyInfo" (fun _ ->
     XmlPokeInnerText "./src/common.props" "//Project/PropertyGroup/VersionPrefix" releaseNotes.AssemblyVersion    
     XmlPokeInnerText "./src/common.props" "//Project/PropertyGroup/PackageReleaseNotes" (releaseNotes.Notes |> String.concat "\n")
@@ -362,9 +371,10 @@ Target "BuildRelease" DoNothing
 Target "All" DoNothing
 Target "Nuget" DoNothing
 Target "Docker" DoNothing
+Target "PrepareDeploy" DoNothing
 
 // build dependencies
-"Clean" ==> "RestorePackages" ==> "AssemblyInfo" ==> "Build" ==> "BuildRelease"
+"Clean" ==> "RestorePackages" ==> "SetReleaseVersion" ==> "AssemblyInfo" ==> "Build" ==> "BuildRelease"
 
 // tests dependencies
 "Clean" ==> "RestorePackages" ==> "Build" ==> "RunTests"
@@ -384,5 +394,8 @@ Target "Docker" DoNothing
 "RunTests" ==> "All"
 "NBench" ==> "All"
 "Nuget" ==> "All"
+
+// Deploy
+"BuildRelease" ==> "Docker" ==> "PrepareDeploy"
 
 RunTargetOrDefault "Help"
