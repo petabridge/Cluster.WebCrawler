@@ -303,15 +303,33 @@ Target "BuildDockerImages" (fun _ ->
                    -- "src/**/*Tests.csproj" // Don't publish unit tests
                    -- "src/**/*Tests*.csproj"
 
+    let remoteRegistryUrl = getBuildParamOrDefault "remoteRegistry" ""
+
     let buildDockerImage imageName projectPath =
-        let args = StringBuilder()
-                |> append "build"
-                |> append "-t"
-                |> append (imageName + ":" + releaseNotes.AssemblyVersion) 
-                |> append "-t"
-                |> append (imageName + ":latest") 
-                |> append "."
-                |> toText
+        
+        let args = 
+            if(hasBuildParam "remoteRegistry") then
+                StringBuilder()
+                    |> append "build"
+                    |> append "-t"
+                    |> append (imageName + ":" + releaseNotes.AssemblyVersion) 
+                    |> append "-t"
+                    |> append (imageName + ":latest") 
+                    |> append "-t"
+                    |> append (remoteRegistryUrl + "/" + imageName + ":" + releaseNotes.AssemblyVersion) 
+                    |> append "-t"
+                    |> append (remoteRegistryUrl + "/" + imageName + ":latest") 
+                    |> append "."
+                    |> toText
+            else
+                StringBuilder()
+                    |> append "build"
+                    |> append "-t"
+                    |> append (imageName + ":" + releaseNotes.AssemblyVersion) 
+                    |> append "-t"
+                    |> append (imageName + ":latest") 
+                    |> append "."
+                    |> toText
 
         ExecProcess(fun info -> 
                 info.FileName <- "docker"
