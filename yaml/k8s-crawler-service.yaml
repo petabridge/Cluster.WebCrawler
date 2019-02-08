@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: crawler
+  labels:
+    app: crawler
+spec:
+  clusterIP: None
+  ports:
+  - port: 5213
+  selector:
+    app: crawler
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: crawler
+  labels:
+    app: crawler
+spec:
+  serviceName: crawler
+  replicas: 3
+  selector:
+    matchLabels:
+      app: crawler
+  template:
+    metadata:
+      labels:
+        app: crawler
+    spec:
+      terminationGracePeriodSeconds: 35
+      containers:
+      - name: crawler
+        image: webcrawler.crawlservice:0.2.2
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "pbm 127.0.0.1:9110 cluster leave"]
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: CLUSTER_IP
+          value: "$(POD_NAME).crawler"
+        - name: CLUSTER_SEEDS
+          value: akka.tcp://webcrawler@lighthouse-0.lighthouse:4053,akka.tcp://webcrawler@lighthouse-1.lighthouse:4053,akka.tcp://webcrawler@lighthouse-2.lighthouse:4053
+        livenessProbe:
+          tcpSocket:
+            port: 5213
+        ports:
+        - containerPort: 5213
+          protocol: TCP

@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tracker
+  labels:
+    app: tracker
+spec:
+  clusterIP: None
+  ports:
+  - port: 5212
+  selector:
+    app: tracker
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: tracker
+  labels:
+    app: tracker
+spec:
+  serviceName: tracker
+  replicas: 3
+  selector:
+    matchLabels:
+      app: tracker
+  template:
+    metadata:
+      labels:
+        app: tracker
+    spec:
+      terminationGracePeriodSeconds: 35
+      containers:
+      - name: tracker
+        image: webcrawler.trackerservice:0.2.2
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "pbm 127.0.0.1:9110 cluster leave"]
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: CLUSTER_IP
+          value: "$(POD_NAME).tracker"
+        - name: CLUSTER_SEEDS
+          value: akka.tcp://webcrawler@lighthouse-0.lighthouse:4053,akka.tcp://webcrawler@lighthouse-1.lighthouse:4053,akka.tcp://webcrawler@lighthouse-2.lighthouse:4053
+        livenessProbe:
+          tcpSocket:
+            port: 5212
+        ports:
+        - containerPort: 5212
+          protocol: TCP

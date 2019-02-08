@@ -10,6 +10,7 @@ using Akka.Bootstrap.Docker;
 using WebCrawler.Shared.Config;
 using WebCrawler.TrackerService.Actors;
 using WebCrawler.TrackerService.Actors.Tracking;
+using WebCrawler.Shared.DevOps;
 
 namespace WebCrawler.TrackerService
 {
@@ -25,15 +26,15 @@ namespace WebCrawler.TrackerService
         public bool Start()
         {
             var config = HoconLoader.ParseConfig("tracker.hocon");
-            ClusterSystem = ActorSystem.Create("webcrawler", config.BootstrapFromDocker());
+            ClusterSystem = ActorSystem.Create("webcrawler", config.ApplyOpsConfig()).StartPbm();
             ApiMaster = ClusterSystem.ActorOf(Props.Create(() => new ApiMaster()), "api");
             DownloadMaster = ClusterSystem.ActorOf(Props.Create(() => new DownloadsMaster()), "downloads");
             return true;
         }
 
-        public Task Stop()
+        public async Task Stop()
         {
-            return CoordinatedShutdown.Get(ClusterSystem).Run();
+            await CoordinatedShutdown.Get(ClusterSystem).Run(CoordinatedShutdown.ClrExitReason.Instance);
         }
     }
 }

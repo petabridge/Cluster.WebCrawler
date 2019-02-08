@@ -213,7 +213,6 @@ namespace WebCrawler.TrackerService.Actors.IO
         {
             foreach (var sub in Subscribers)
                 sub.Tell(RunningStatus);
-            Context.System.EventStream.Publish(1.0d);
         }
     }
 }

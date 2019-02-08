@@ -1,25 +1,23 @@
-FROM microsoft/dotnet:1.1-sdk AS build-env
+FROM microsoft/dotnet:2.1-sdk AS base
 WORKDIR /app
-
-ENV ACTORSYSTEM "lighthouse"
 
 # should be a comma-delimited list
-ENV SEEDS "[]"
+ENV CLUSTER_SEEDS "[]"
+ENV CLUSTER_IP ""
+ENV CLUSTER_PORT "4053"
 
-COPY src/Lighthouse/*.csproj ./
-RUN dotnet restore
-
-COPY src/Lighthouse ./
-RUN dotnet publish -c Release --framework netcoreapp1.1 -o out
-
-FROM microsoft/dotnet:1.1-runtime AS runtime
-WORKDIR /app
-COPY --from=build-env /app/out ./
-COPY --from=build-env /app/get-dockerip.sh ./get-dockerip.sh
-ENTRYPOINT ["/bin/bash","get-dockerip.sh"]
+COPY ./bin/Release/netcoreapp2.1/publish/ /app
 
 # 9110 - Petabridge.Cmd
 # 4053 - Akka.Cluster
 EXPOSE 9110 4053
+
+# Install Petabridge.Cmd client
+RUN dotnet tool install --global pbm 
+
+# Needed because https://stackoverflow.com/questions/51977474/install-dotnet-core-tool-dockerfile
+ENV PATH="${PATH}:/root/.dotnet/tools"
+
+# RUN pbm help
 
 CMD ["dotnet", "Lighthouse.dll"]
