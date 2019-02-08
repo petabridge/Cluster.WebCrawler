@@ -2,10 +2,9 @@
   <PropertyGroup>
     <Copyright>Copyright © 2015-2019 Petabridge, LLC</Copyright>
     <Authors>Petabridge</Authors>
-    <VersionPrefix>0.2.2</VersionPrefix>
-    <PackageReleaseNotes>Added shared DevOps infrastructure.
-Setting the stage for the use of Phobos in future releases.
-Resolved [Install pbm on all nodes](https://github.com/petabridge/Cluster.WebCrawler/issues/10)</PackageReleaseNotes>
+    <VersionPrefix>0.2.3</VersionPrefix>
+    <PackageReleaseNotes>Made it possible to tag all WebCrawler docker images more easily via `build.fsx`.
+Made `build.sh` executable.</PackageReleaseNotes>
     <PackageIconUrl>
     </PackageIconUrl>
     <PackageProjectUrl>
