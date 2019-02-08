@@ -302,7 +302,7 @@ Target "BuildDockerImages" (fun _ ->
     let projects = !! "src/**/*.csproj" 
                    -- "src/**/*Tests.csproj" // Don't publish unit tests
                    -- "src/**/*Tests*.csproj"
-    
+
     let buildDockerImage imageName projectPath =
         let args = StringBuilder()
                 |> append "build"

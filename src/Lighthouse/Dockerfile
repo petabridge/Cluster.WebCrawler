@@ -18,6 +18,6 @@ RUN dotnet tool install --global pbm
 # Needed because https://stackoverflow.com/questions/51977474/install-dotnet-core-tool-dockerfile
 ENV PATH="${PATH}:/root/.dotnet/tools"
 
-RUN pbm help
+# RUN pbm help
 
 CMD ["dotnet", "Lighthouse.dll"]
