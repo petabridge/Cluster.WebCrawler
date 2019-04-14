@@ -31,7 +31,7 @@ spec:
       terminationGracePeriodSeconds: 35
       containers:
       - name: lighthouse
-        image: webcrawler.lighthouse:0.2.2
+        image: webcrawler.lighthouse:0.2.3
         lifecycle:
           preStop:
             exec:
