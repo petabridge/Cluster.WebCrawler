@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="Petabridge.Cmd.Cluster" Version="$(PetabridgeCmdVersion)" />
-    <PackageReference Include="Akka.Cluster.HealthCheck" Version="$(AkkaHealthCheckVersion)" />
+    <PackageReference Include="Akka.HealthCheck.Cluster" Version="$(AkkaHealthCheckVersion)" />
     <PackageReference Include="Akka.Bootstrap.Docker" Version="$(AkkaBootstrapVersion)" />
   </ItemGroup>
 
