@@ -50,7 +50,7 @@ namespace WebCrawler.Shared.IO
             var selfDocSink = Sink.ActorRef<CompletedDocument>(Self, StreamCompleteTick.Instance);
             var selfImgSink = Sink.ActorRef<CompletedDocument>(Self, StreamCompleteTick.Instance);
             var htmlFlow = Flow.Create<CrawlDocument>().Via(DownloadFlow.SelectDocType())
-                .Throttle(30, TimeSpan.FromSeconds(1), 100, ThrottleMode.Shaping)
+                .Throttle(30, TimeSpan.FromSeconds(5), 100, ThrottleMode.Shaping)
                 .Via(DownloadFlow.ProcessHtmlDownloadFor(DefaultMaxConcurrentDownloads, HttpClientFactory.GetClient()));
 
             var imageFlow = Flow.Create<CrawlDocument>()
