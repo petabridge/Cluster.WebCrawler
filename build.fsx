@@ -77,7 +77,7 @@ Target "RestorePackages" (fun _ ->
                 { p with
                     Project = solutionFile
                     NoCache = false
-                    AdditionalArgs = [sprintf "-s %s" customSource]})
+                    AdditionalArgs = [sprintf "-s %s -s https://api.nuget.org/v3/index.json" customSource]})
     else
         DotNetCli.Restore
             (fun p -> 
