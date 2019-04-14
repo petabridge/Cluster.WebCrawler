@@ -31,7 +31,7 @@ spec:
       terminationGracePeriodSeconds: 35
       containers:
       - name: web-cluster
-        image: webcrawler.web:0.2.3
+        image: webcrawler.web:0.2.4
         lifecycle:
           preStop:
             exec:

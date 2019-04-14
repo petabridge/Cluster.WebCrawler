@@ -1,3 +1,2 @@
-#### 0.2.3 Feb 08 2019 ####
-* Made it possible to tag all WebCrawler docker images more easily via `build.fsx`.
-* Made `build.sh` executable.
+#### 0.2.4 March 06 2019 ####
+* Upgraded to [Petabridge.Cmd v0.5.0](https://cmd.petabridge.com/articles/RELEASE_NOTES.html#v050-march-05-2019) so we could take advantage of the `cluster tail` command.
