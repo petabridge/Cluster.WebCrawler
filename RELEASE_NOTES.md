@@ -1,2 +1,3 @@
-#### 0.2.4 April 14 2019 ####
-* Upgraded to [Petabridge.Cmd v0.5.0](https://cmd.petabridge.com/articles/RELEASE_NOTES.html#v050-march-05-2019) so we could take advantage of the `cluster tail` command.
+#### 0.2.5 April 14 2019 ####
+* Upgraded to Akka.Cluster v1.3.12
+* Upgraded to [Akka.HealthCheck.Cluster v0.2.1](https://github.com/petabridge/akkadotnet-healthcheck/releases/tag/0.2.1)
