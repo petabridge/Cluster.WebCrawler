@@ -69,11 +69,21 @@ Target "AssemblyInfo" (fun _ ->
 )
 
 Target "RestorePackages" (fun _ ->
-    DotNetCli.Restore
-        (fun p -> 
-            { p with
-                Project = solutionFile
-                NoCache = false })
+    let customSource = getBuildParamOrDefault "customNuGetSource" ""
+
+    if(hasBuildParam "customNuGetSource") then
+        DotNetCli.Restore
+            (fun p -> 
+                { p with
+                    Project = solutionFile
+                    NoCache = false
+                    AdditionalArgs = [sprintf "-s %s -s https://api.nuget.org/v3/index.json" customSource]})
+    else
+        DotNetCli.Restore
+            (fun p -> 
+                { p with
+                    Project = solutionFile
+                    NoCache = false })
 )
 
 Target "Build" (fun _ ->          
@@ -405,7 +415,7 @@ Target "PrepareDeploy" DoNothing
 "Clean" ==> "RestorePackages" ==> "BuildRelease" ==> "Docfx"
 
 // Docker
-"Clean" ==> "PublishCode" ==> "BuildDockerImages" ==> "Docker"
+"BuildRelease" ==> "PublishCode" ==> "BuildDockerImages" ==> "Docker"
 
 // all
 "BuildRelease" ==> "All"
@@ -414,6 +424,6 @@ Target "PrepareDeploy" DoNothing
 "Nuget" ==> "All"
 
 // Deploy
-"BuildRelease" ==> "Docker" ==> "PrepareDeploy"
+"Docker" ==> "PrepareDeploy"
 
 RunTargetOrDefault "Help"

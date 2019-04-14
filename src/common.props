@@ -2,9 +2,8 @@
   <PropertyGroup>
     <Copyright>Copyright © 2015-2019 Petabridge, LLC</Copyright>
     <Authors>Petabridge</Authors>
-    <VersionPrefix>0.2.3</VersionPrefix>
-    <PackageReleaseNotes>Made it possible to tag all WebCrawler docker images more easily via `build.fsx`.
-Made `build.sh` executable.</PackageReleaseNotes>
+    <VersionPrefix>0.2.4</VersionPrefix>
+    <PackageReleaseNotes>Upgraded to [Petabridge.Cmd v0.5.0](https://cmd.petabridge.com/articles/RELEASE_NOTES.html#v050-march-05-2019) so we could take advantage of the `cluster tail` command.</PackageReleaseNotes>
     <PackageIconUrl>
     </PackageIconUrl>
     <PackageProjectUrl>
@@ -18,7 +17,7 @@ Made `build.sh` executable.</PackageReleaseNotes>
     <AkkaVersion>1.3.11</AkkaVersion>
     <AkkaBootstrapVersion>0.2.0</AkkaBootstrapVersion>
     <AkkaHealthCheckVersion>0.1.0</AkkaHealthCheckVersion>
-    <PetabridgeCmdVersion>0.4.1</PetabridgeCmdVersion>
+    <PetabridgeCmdVersion>0.5.0</PetabridgeCmdVersion>
     <NetCoreVersion>netcoreapp2.1</NetCoreVersion>
   </PropertyGroup>
 </Project>
