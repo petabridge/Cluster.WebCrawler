@@ -1,4 +1,10 @@
-﻿using System;
+﻿// -----------------------------------------------------------------------
+// <copyright file="CrawlMaster.cs" company="Petabridge, LLC">
+//      Copyright (C) 2015 - 2019 Petabridge, LLC <https://petabridge.com>
+// </copyright>
+// -----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Akka.Actor;
@@ -12,59 +18,24 @@ using WebCrawler.TrackerService.Actors.Tracking;
 namespace WebCrawler.TrackerService.Actors.IO
 {
     /// <summary>
-    /// Actor responsible for individual <see cref="CrawlJob"/>
+    ///     Actor responsible for individual <see cref="CrawlJob" />
     /// </summary>
     public class CrawlMaster : ReceiveActor, IWithUnboundedStash
     {
-
-        #region Messages
-
-        public class CrawlCanStart
-        {
-            public CrawlCanStart(IStartJobV1 job, int nodeCount)
-            {
-                Job = job;
-                NodeCount = nodeCount;
-            }
-
-            public IStartJobV1 Job { get; private set; }
-            public int NodeCount { get; private set; }
-        }
-
-        public class AttemptToStartJob
-        {
-            public AttemptToStartJob(IStartJobV1 job)
-            {
-                Job = job;
-            }
-
-            public IStartJobV1 Job { get; private set; }
-        }
-
-        #endregion
-
         public const string CoordinatorRouterName = "coordinators";
         protected readonly CrawlJob Job;
-
-        /// <summary>
-        /// All of the actors subscribed to updates for <see cref="Job"/>
-        /// </summary>
-        protected HashSet<IActorRef> Subscribers = new HashSet<IActorRef>();
-
-        protected JobStatusUpdate RunningStatus;
-
-        protected CrawlJobStats TotalStats
-        {
-            get { return RunningStatus.Stats; }
-            set { RunningStatus = RunningStatus.WithStats(value); }
-        }
 
         protected IActorRef CoordinatorRouter;
         protected IActorRef DownloadTracker;
         protected ICancelable JobStarter;
         protected ILoggingAdapter Log = Context.GetLogger();
 
-        public IStash Stash { get; set; }
+        protected JobStatusUpdate RunningStatus;
+
+        /// <summary>
+        ///     All of the actors subscribed to updates for <see cref="Job" />
+        /// </summary>
+        protected HashSet<IActorRef> Subscribers = new HashSet<IActorRef>();
 
         public CrawlMaster(CrawlJob job)
         {
@@ -74,6 +45,14 @@ namespace WebCrawler.TrackerService.Actors.IO
             Context.SetReceiveTimeout(TimeSpan.FromSeconds(5));
             WaitingForTracker();
         }
+
+        protected CrawlJobStats TotalStats
+        {
+            get => RunningStatus.Stats;
+            set => RunningStatus = RunningStatus.WithStats(value);
+        }
+
+        public IStash Stash { get; set; }
 
         protected override void PreStart()
         {
@@ -107,19 +86,16 @@ namespace WebCrawler.TrackerService.Actors.IO
             // stash everything else until we have a tracker
             ReceiveAny(o => Stash.Stash());
         }
+
         private void BecomeReady()
         {
             if (Context.Child(CoordinatorRouterName).Equals(ActorRefs.Nobody))
-            {
                 CoordinatorRouter =
                     Context.ActorOf(
                         Props.Create(() => new DownloadCoordinator(Job, Self, DownloadTracker, 50))
                             .WithRouter(FromConfig.Instance), CoordinatorRouterName);
-            }
             else //in the event of a restart
-            {
                 CoordinatorRouter = Context.Child(CoordinatorRouterName);
-            }
             Become(Ready);
             Stash.UnstashAll();
             Context.SetReceiveTimeout(TimeSpan.FromSeconds(120));
@@ -158,14 +134,10 @@ namespace WebCrawler.TrackerService.Actors.IO
                 Stash.UnstashAll();
             });
 
-            Receive<CrawlCanStart>(start =>
-            {
-                Log.Info("Can't start job yet. No routees.");
-            });
+            Receive<CrawlCanStart>(start => { Log.Info("Can't start job yet. No routees."); });
 
 
             ReceiveAny(o => Stash.Stash());
-
         }
 
         private void Started()
@@ -214,5 +186,31 @@ namespace WebCrawler.TrackerService.Actors.IO
             foreach (var sub in Subscribers)
                 sub.Tell(RunningStatus);
         }
+
+        #region Messages
+
+        public class CrawlCanStart
+        {
+            public CrawlCanStart(IStartJobV1 job, int nodeCount)
+            {
+                Job = job;
+                NodeCount = nodeCount;
+            }
+
+            public IStartJobV1 Job { get; }
+            public int NodeCount { get; }
+        }
+
+        public class AttemptToStartJob
+        {
+            public AttemptToStartJob(IStartJobV1 job)
+            {
+                Job = job;
+            }
+
+            public IStartJobV1 Job { get; }
+        }
+
+        #endregion
     }
 }

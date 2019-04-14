@@ -1,38 +1,20 @@
-﻿using Akka.Actor;
-using Microsoft.AspNetCore.SignalR;
+﻿// -----------------------------------------------------------------------
+// <copyright file="SignalRActor.cs" company="Petabridge, LLC">
+//      Copyright (C) 2015 - 2019 Petabridge, LLC <https://petabridge.com>
+// </copyright>
+// -----------------------------------------------------------------------
+
+using Akka.Actor;
 using WebCrawler.Shared.Commands.V1;
 using WebCrawler.Web.Hubs;
 
 namespace WebCrawler.Web.Actors
 {
     /// <summary>
-    /// Actor used to wrap a signalr hub
+    ///     Actor used to wrap a signalr hub
     /// </summary>
     public class SignalRActor : ReceiveActor, IWithUnboundedStash
     {
-        #region Messages
-
-        public class DebugCluster
-        {
-            public DebugCluster(string message)
-            {
-                Message = message;
-            }
-
-            public string Message { get; private set; }
-        }
-
-        public class SetHub : INoSerializationVerificationNeeded
-        {
-            public SetHub(CrawlHubHelper hub)
-            {
-                Hub = hub;
-            }
-            public CrawlHubHelper Hub { get; }
-        }
-
-        #endregion
-
         private readonly IActorRef _commandProcessor;
 
         private CrawlHubHelper _hub;
@@ -43,6 +25,9 @@ namespace WebCrawler.Web.Actors
 
             WaitingForHub();
         }
+
+
+        public IStash Stash { get; set; }
 
         private void HubAvailable()
         {
@@ -75,7 +60,28 @@ namespace WebCrawler.Web.Actors
             ReceiveAny(_ => Stash.Stash());
         }
 
+        #region Messages
 
-        public IStash Stash { get; set; }
+        public class DebugCluster
+        {
+            public DebugCluster(string message)
+            {
+                Message = message;
+            }
+
+            public string Message { get; }
+        }
+
+        public class SetHub : INoSerializationVerificationNeeded
+        {
+            public SetHub(CrawlHubHelper hub)
+            {
+                Hub = hub;
+            }
+
+            public CrawlHubHelper Hub { get; }
+        }
+
+        #endregion
     }
 }

@@ -1,4 +1,10 @@
-﻿using System;
+﻿// -----------------------------------------------------------------------
+// <copyright file="CommandProcessor.cs" company="Petabridge, LLC">
+//      Copyright (C) 2015 - 2019 Petabridge, LLC <https://petabridge.com>
+// </copyright>
+// -----------------------------------------------------------------------
+
+using System;
 using System.Linq;
 using Akka.Actor;
 using Akka.Routing;
@@ -8,37 +14,10 @@ using WebCrawler.Shared.State;
 namespace WebCrawler.Web.Actors
 {
     /// <summary>
-    /// Actor responsible for processing commands
+    ///     Actor responsible for processing commands
     /// </summary>
     public class CommandProcessor : ReceiveActor
     {
-        #region Messages
-
-        public class AttemptCrawl
-        {
-            public AttemptCrawl(string rawStr)
-            {
-                RawStr = rawStr;
-            }
-
-            public string RawStr { get; private set; }
-        }
-
-        public class BadCrawlAttempt
-        {
-            public BadCrawlAttempt(string rawStr, string message)
-            {
-                Message = message;
-                RawStr = rawStr;
-            }
-
-            public string RawStr { get; private set; }
-
-            public string Message { get; private set; }
-        }
-
-        #endregion
-
         protected readonly IActorRef CommandRouter;
 
         public CommandProcessor(IActorRef commandRouter)
@@ -74,5 +53,32 @@ namespace WebCrawler.Web.Actors
                 }
             });
         }
+
+        #region Messages
+
+        public class AttemptCrawl
+        {
+            public AttemptCrawl(string rawStr)
+            {
+                RawStr = rawStr;
+            }
+
+            public string RawStr { get; }
+        }
+
+        public class BadCrawlAttempt
+        {
+            public BadCrawlAttempt(string rawStr, string message)
+            {
+                Message = message;
+                RawStr = rawStr;
+            }
+
+            public string RawStr { get; }
+
+            public string Message { get; }
+        }
+
+        #endregion
     }
 }
