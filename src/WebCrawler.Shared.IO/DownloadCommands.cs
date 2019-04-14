@@ -1,6 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿// -----------------------------------------------------------------------
+// <copyright file="DownloadCommands.cs" company="Petabridge, LLC">
+//      Copyright (C) 2015 - 2019 Petabridge, LLC <https://petabridge.com>
+// </copyright>
+// -----------------------------------------------------------------------
+
+using System;
 using System.Net;
 using WebCrawler.Shared.State;
 
@@ -13,7 +17,7 @@ namespace WebCrawler.Shared.IO
     }
 
     /// <summary>
-    /// Results form a <see cref="DownloadHtmlDocument"/> operation
+    ///     Results form a <see cref="DownloadHtmlDocument" /> operation
     /// </summary>
     public class DownloadHtmlResult : IDownloadResult
     {
@@ -50,8 +54,8 @@ namespace WebCrawler.Shared.IO
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((DownloadImage)obj);
+            if (obj.GetType() != GetType()) return false;
+            return Equals((DownloadImage) obj);
         }
 
         public override int GetHashCode()
@@ -61,7 +65,7 @@ namespace WebCrawler.Shared.IO
     }
 
     /// <summary>
-    /// Results from a <see cref="DownloadImage"/> operation
+    ///     Results from a <see cref="DownloadImage" /> operation
     /// </summary>
     public class DownloadImageResult : IDownloadResult
     {
@@ -72,11 +76,11 @@ namespace WebCrawler.Shared.IO
             Command = command;
         }
 
-        public IDownloadDocument Command { get; private set; }
+        public byte[] Bytes { get; }
 
-        public byte[] Bytes { get; private set; }
+        public IDownloadDocument Command { get; }
 
-        public HttpStatusCode Status { get; private set; }
+        public HttpStatusCode Status { get; }
     }
 
     public class DownloadHtmlDocument : IDownloadDocument, IEquatable<DownloadHtmlDocument>
@@ -99,8 +103,8 @@ namespace WebCrawler.Shared.IO
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((DownloadHtmlDocument)obj);
+            if (obj.GetType() != GetType()) return false;
+            return Equals((DownloadHtmlDocument) obj);
         }
 
         public override int GetHashCode()

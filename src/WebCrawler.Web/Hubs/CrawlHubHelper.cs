@@ -1,4 +1,10 @@
-﻿using System;
+﻿// -----------------------------------------------------------------------
+// <copyright file="CrawlHubHelper.cs" company="Petabridge, LLC">
+//      Copyright (C) 2015 - 2019 Petabridge, LLC <https://petabridge.com>
+// </copyright>
+// -----------------------------------------------------------------------
+
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Akka.Actor;
@@ -11,7 +17,7 @@ namespace WebCrawler.Web.Hubs
 {
     /// <inheritdoc />
     /// <summary>
-    /// Necessary for getting access to a hub and passing it along to our actors
+    ///     Necessary for getting access to a hub and passing it along to our actors
     /// </summary>
     public class CrawlHubHelper : IHostedService
     {
@@ -20,6 +26,18 @@ namespace WebCrawler.Web.Hubs
         public CrawlHubHelper(IHubContext<CrawlHub> hub)
         {
             _hub = hub;
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            AkkaStartupTasks.StartAkka();
+            SystemActors.SignalRActor.Tell(new SignalRActor.SetHub(this));
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
         }
 
         public void PushStatus(IStatusUpdateV1 update)
@@ -41,18 +59,6 @@ namespace WebCrawler.Web.Hubs
         internal void WriteMessage(string message)
         {
             _hub.Clients.All.SendAsync("writeStatus", message);
-        }
-
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            AkkaStartupTasks.StartAkka();
-            SystemActors.SignalRActor.Tell(new SignalRActor.SetHub(this));
-            return Task.CompletedTask;
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
         }
     }
 }

@@ -1,13 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// -----------------------------------------------------------------------
+// <copyright file="HoconLoader.cs" company="Petabridge, LLC">
+//      Copyright (C) 2015 - 2019 Petabridge, LLC <https://petabridge.com>
+// </copyright>
+// -----------------------------------------------------------------------
+
 using System.IO;
-using System.Text;
 using Akka.Configuration;
 
 namespace WebCrawler.Shared.Config
 {
     /// <summary>
-    /// Used to load <see cref="WebCrawler.Shared.Config"/> objects from stand-alone HOCON files.
+    ///     Used to load <see cref="WebCrawler.Shared.Config" /> objects from stand-alone HOCON files.
     /// </summary>
     public static class HoconLoader
     {

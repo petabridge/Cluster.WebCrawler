@@ -1,4 +1,10 @@
-﻿using System;
+﻿// -----------------------------------------------------------------------
+// <copyright file="DownloadsTracker.cs" company="Petabridge, LLC">
+//      Copyright (C) 2015 - 2019 Petabridge, LLC <https://petabridge.com>
+// </copyright>
+// -----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using Akka.Actor;
 using WebCrawler.Shared.IO.Messages;
@@ -8,14 +14,16 @@ using WebCrawler.TrackerService.State;
 namespace WebCrawler.TrackerService.Actors.Tracking
 {
     /// <summary>
-    /// Actor responsible for documenting the persistence of documents
+    ///     Actor responsible for documenting the persistence of documents
     /// </summary>
     public class DownloadsTracker : ReceiveActor
     {
-        private readonly Dictionary<CrawlDocument, CrawlStatus> _recordedDocuments;
         private readonly TimeSpan _defaultCrawlTime;
+        private readonly Dictionary<CrawlDocument, CrawlStatus> _recordedDocuments;
 
-        public DownloadsTracker() : this(new Dictionary<CrawlDocument, CrawlStatus>(), TimeSpan.FromSeconds(30)) { }
+        public DownloadsTracker() : this(new Dictionary<CrawlDocument, CrawlStatus>(), TimeSpan.FromSeconds(30))
+        {
+        }
 
         public DownloadsTracker(Dictionary<CrawlDocument, CrawlStatus> recordedDocuments, TimeSpan defaultCrawlTime)
         {
@@ -32,20 +40,20 @@ namespace WebCrawler.TrackerService.Actors.Tracking
                 var availableDocs = new List<CrawlDocument>();
                 var discoveredDocs = new List<CrawlDocument>();
                 foreach (var doc in check.Documents)
-                {
                     //first time we've seen this doc
                     if (!_recordedDocuments.ContainsKey(doc))
                     {
-                        _recordedDocuments[doc] = CrawlStatus.StartCrawl(check.Requestor, check.EstimatedCrawlTime ?? _defaultCrawlTime);
+                        _recordedDocuments[doc] = CrawlStatus.StartCrawl(check.Requestor,
+                            check.EstimatedCrawlTime ?? _defaultCrawlTime);
                         availableDocs.Add(doc);
                         discoveredDocs.Add(doc);
                     }
-                    else if(_recordedDocuments[doc].TryClaim(check.Requestor, check.EstimatedCrawlTime ?? _defaultCrawlTime))
+                    else if (_recordedDocuments[doc]
+                        .TryClaim(check.Requestor, check.EstimatedCrawlTime ?? _defaultCrawlTime))
                     {
                         //TODO: add status message about new actor taking over processing here
                         availableDocs.Add(doc);
                     }
-                }
 
                 Sender.Tell(new ProcessDocuments(availableDocs, check.Requestor));
                 Sender.Tell(new DiscoveredDocuments(discoveredDocs, check.Requestor));
