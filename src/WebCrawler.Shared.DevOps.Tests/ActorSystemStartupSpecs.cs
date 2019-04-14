@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Akka.Actor;
-using Akka.Cluster.HealthCheck;
+using Akka.HealthCheck.Cluster;
 using Akka.HealthCheck;
 using Akka.HealthCheck.Liveness;
 using Akka.HealthCheck.Readiness;
