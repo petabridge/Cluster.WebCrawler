@@ -1,4 +1,10 @@
-﻿using System;
+﻿// -----------------------------------------------------------------------
+// <copyright file="ParseFlow.cs" company="Petabridge, LLC">
+//      Copyright (C) 2015 - 2019 Petabridge, LLC <https://petabridge.com>
+// </copyright>
+// -----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Akka;
@@ -17,7 +23,6 @@ namespace WebCrawler.Shared.IO
             return Flow.Create<DownloadHtmlResult>().Async()
                 .Select(downloadHtmlResult =>
                 {
-
                     var requestedUrls = new List<CrawlDocument>();
 
                     var htmlString = downloadHtmlResult.Content;
@@ -56,7 +61,8 @@ namespace WebCrawler.Shared.IO
                         requestedUrls = requestedUrls.Concat(validLinkUris).ToList();
                     }
 
-                    return new CheckDocuments(requestedUrls, ActorRefs.NoSender, TimeSpan.FromMilliseconds(requestedUrls.Count*5000));
+                    return new CheckDocuments(requestedUrls, ActorRefs.NoSender,
+                        TimeSpan.FromMilliseconds(requestedUrls.Count * 5000));
                 });
         }
 
@@ -83,7 +89,9 @@ namespace WebCrawler.Shared.IO
 
         public static Uri ToAsboluteUri(CrawlJob jobRoot, string rawUri)
         {
-            return Uri.IsWellFormedUriString(rawUri, UriKind.Absolute) ? new Uri(rawUri, UriKind.Absolute) : new Uri(jobRoot.Root, rawUri);
+            return Uri.IsWellFormedUriString(rawUri, UriKind.Absolute)
+                ? new Uri(rawUri, UriKind.Absolute)
+                : new Uri(jobRoot.Root, rawUri);
         }
     }
 }

@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿// -----------------------------------------------------------------------
+// <copyright file="DownloadFlow.cs" company="Petabridge, LLC">
+//      Copyright (C) 2015 - 2019 Petabridge, LLC <https://petabridge.com>
+// </copyright>
+// -----------------------------------------------------------------------
+
+using System;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Akka;
 using Akka.Actor;
-using Akka.Streams.Actors;
 using Akka.Streams.Dsl;
 using Akka.Util.Internal;
-using WebCrawler.Shared.IO.Messages;
 using WebCrawler.Shared.State;
 
 namespace WebCrawler.Shared.IO
@@ -20,10 +21,11 @@ namespace WebCrawler.Shared.IO
         public static Flow<CrawlDocument, IDownloadDocument, NotUsed> SelectDocType()
         {
             return Flow.Create<CrawlDocument>()
-                .Select(x => (x.IsImage ? new DownloadImage(x) : (IDownloadDocument)new DownloadHtmlDocument(x)));
+                .Select(x => x.IsImage ? new DownloadImage(x) : (IDownloadDocument) new DownloadHtmlDocument(x));
         }
 
-        public static Flow<IDownloadDocument, DownloadHtmlResult, NotUsed> ProcessHtmlDownloadFor(int degreeOfParallelism, HttpClient client)
+        public static Flow<IDownloadDocument, DownloadHtmlResult, NotUsed> ProcessHtmlDownloadFor(
+            int degreeOfParallelism, HttpClient client)
         {
             return Flow.Create<IDownloadDocument>()
                 .Where(x => x is DownloadHtmlDocument)
@@ -55,7 +57,8 @@ namespace WebCrawler.Shared.IO
             return Flow.Create<DownloadHtmlResult>()
                 .Select(
                     x =>
-                        new CompletedDocument(x.Command.AsInstanceOf<DownloadHtmlDocument>().Document, x.Content.Length*2,
+                        new CompletedDocument(x.Command.AsInstanceOf<DownloadHtmlDocument>().Document,
+                            x.Content.Length * 2,
                             ActorRefs.NoSender));
         }
 
@@ -64,7 +67,7 @@ namespace WebCrawler.Shared.IO
         {
             return Flow.Create<IDownloadDocument>()
                 .Where(x => x is DownloadImage)
-                .Select(x => (DownloadImage)x)
+                .Select(x => (DownloadImage) x)
                 .SelectAsyncUnordered(degreeOfParallelism,
                     document =>
                         client.GetByteArrayAsync(document.Document.DocumentUri)

@@ -1,77 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using Akka;
+﻿// -----------------------------------------------------------------------
+// <copyright file="DownloadCoordinator.cs" company="Petabridge, LLC">
+//      Copyright (C) 2015 - 2019 Petabridge, LLC <https://petabridge.com>
+// </copyright>
+// -----------------------------------------------------------------------
+
+using System;
 using Akka.Actor;
 using Akka.Event;
-using Akka.Routing;
 using Akka.Streams;
-using Akka.Streams.Actors;
 using Akka.Streams.Dsl;
-using Akka.Streams.Implementation;
 using WebCrawler.Shared.IO.Messages;
 using WebCrawler.Shared.State;
 
 namespace WebCrawler.Shared.IO
 {
     /// <summary>
-    /// Actor responsible for using Akka.Streams to execute download and parsing of all content.
-    /// 
-    /// Can be remote-deployed to other systems.
-    /// 
-    /// Publishes statistics updates to its parent.
+    ///     Actor responsible for using Akka.Streams to execute download and parsing of all content.
+    ///     Can be remote-deployed to other systems.
+    ///     Publishes statistics updates to its parent.
     /// </summary>
     public class DownloadCoordinator : ReceiveActor
     {
-        #region Constants
-
-        public const string Downloader = "downloader";
-        public const string Parser = "parser";
-
-        #endregion
-
-        #region Messages
-
-        /// <summary>
-        /// Used to signal that it's time to publish to the JobMaster
-        /// </summary>
-        public class PublishStatsTick
-        {
-            private PublishStatsTick() { }
-            private static readonly PublishStatsTick _instance = new PublishStatsTick();
-
-            public static PublishStatsTick Instance
-            {
-                get { return _instance; }
-            }
-        }
-
-        public class StreamCompleteTick
-        {
-            private StreamCompleteTick() { }
-            public static readonly StreamCompleteTick Instance = new StreamCompleteTick();
-        }
-
-        #endregion
-
-        const int DefaultMaxConcurrentDownloads = 50;
-        protected readonly IActorRef DownloadsTracker;
+        private const int DefaultMaxConcurrentDownloads = 50;
         protected readonly IActorRef Commander;
-
-        protected IActorRef DownloaderRouter;
-        protected IActorRef ParserRouter;
-        protected IActorRef SourceActor;
-
-        protected CrawlJob Job;
-        protected CrawlJobStats Stats;
+        protected readonly IActorRef DownloadsTracker;
 
         protected readonly long MaxConcurrentDownloads;
 
+        private readonly ILoggingAdapter _logger = Context.GetLogger();
+
         private ICancelable _publishStatsTask;
 
-        private ILoggingAdapter _logger = Context.GetLogger();
+        protected IActorRef DownloaderRouter;
 
-        public DownloadCoordinator(CrawlJob job, IActorRef commander, IActorRef downloadsTracker, long maxConcurrentDownloads)
+        protected CrawlJob Job;
+        protected IActorRef ParserRouter;
+        protected IActorRef SourceActor;
+        protected CrawlJobStats Stats;
+
+        public DownloadCoordinator(CrawlJob job, IActorRef commander, IActorRef downloadsTracker,
+            long maxConcurrentDownloads)
         {
             Job = job;
             DownloadsTracker = downloadsTracker;
@@ -82,7 +50,7 @@ namespace WebCrawler.Shared.IO
             var selfDocSink = Sink.ActorRef<CompletedDocument>(Self, StreamCompleteTick.Instance);
             var selfImgSink = Sink.ActorRef<CompletedDocument>(Self, StreamCompleteTick.Instance);
             var htmlFlow = Flow.Create<CrawlDocument>().Via(DownloadFlow.SelectDocType())
-                .Throttle(30, TimeSpan.FromSeconds(1), 100, ThrottleMode.Shaping)
+                .Throttle(30, TimeSpan.FromSeconds(5), 100, ThrottleMode.Shaping)
                 .Via(DownloadFlow.ProcessHtmlDownloadFor(DefaultMaxConcurrentDownloads, HttpClientFactory.GetClient()));
 
             var imageFlow = Flow.Create<CrawlDocument>()
@@ -93,7 +61,7 @@ namespace WebCrawler.Shared.IO
 
             var source = Source.ActorRef<CrawlDocument>(5000, OverflowStrategy.DropTail);
 
-           var graph = GraphDsl.Create(source, (builder, s) =>
+            var graph = GraphDsl.Create(source, (builder, s) =>
             {
                 // html flows
                 var downloadHtmlFlow = builder.Add(htmlFlow);
@@ -131,7 +99,8 @@ namespace WebCrawler.Shared.IO
         {
             // Schedule regular stats updates
             _publishStatsTask = new Cancelable(Context.System.Scheduler);
-            Context.System.Scheduler.ScheduleTellRepeatedly(TimeSpan.FromMilliseconds(250), TimeSpan.FromMilliseconds(250), Self, PublishStatsTick.Instance, Self, _publishStatsTask);
+            Context.System.Scheduler.ScheduleTellRepeatedly(TimeSpan.FromMilliseconds(250),
+                TimeSpan.FromMilliseconds(250), Self, PublishStatsTick.Instance, Self, _publishStatsTask);
         }
 
         protected override void PreRestart(Exception reason, object message)
@@ -147,7 +116,9 @@ namespace WebCrawler.Shared.IO
                 //cancel the regularly scheduled task
                 _publishStatsTask.Cancel();
             }
-            catch { }
+            catch
+            {
+            }
         }
 
         private void Receiving()
@@ -173,37 +144,59 @@ namespace WebCrawler.Shared.IO
             });
 
             //Update our local stats
-            Receive<DiscoveredDocuments>(discovered =>
-            {
-                Stats = Stats.WithDiscovered(discovered);
-            });
+            Receive<DiscoveredDocuments>(discovered => { Stats = Stats.WithDiscovered(discovered); });
 
             //Received word from the DownloadTracker that we need to process some docs
             Receive<ProcessDocuments>(process =>
             {
                 foreach (var doc in process.Documents)
-                {
                     SourceActor.Tell(doc);
-                }
             });
 
             //hand the work off to the downloaders
-            Receive<IDownloadDocument>(download =>
-            {
-                SourceActor.Tell(download.Document);
-            });
+            Receive<IDownloadDocument>(download => { SourceActor.Tell(download.Document); });
 
             Receive<CompletedDocument>(completed =>
             {
-                _logger.Info("Logging completed download {0} bytes {1}", completed.Document.DocumentUri,completed.NumBytes);
+                _logger.Info("Logging completed download {0} bytes {1}", completed.Document.DocumentUri,
+                    completed.NumBytes);
                 Stats = Stats.WithCompleted(completed);
                 _logger.Info("Total stats {0}", Stats);
             });
 
-            Receive<StreamCompleteTick>(_ =>
-            {
-                _logger.Info("Stream has completed. No more messages to process.");
-            });
+            Receive<StreamCompleteTick>(_ => { _logger.Info("Stream has completed. No more messages to process."); });
         }
+
+        #region Constants
+
+        public const string Downloader = "downloader";
+        public const string Parser = "parser";
+
+        #endregion
+
+        #region Messages
+
+        /// <summary>
+        ///     Used to signal that it's time to publish to the JobMaster
+        /// </summary>
+        public class PublishStatsTick
+        {
+            private PublishStatsTick()
+            {
+            }
+
+            public static PublishStatsTick Instance { get; } = new PublishStatsTick();
+        }
+
+        public class StreamCompleteTick
+        {
+            public static readonly StreamCompleteTick Instance = new StreamCompleteTick();
+
+            private StreamCompleteTick()
+            {
+            }
+        }
+
+        #endregion
     }
 }

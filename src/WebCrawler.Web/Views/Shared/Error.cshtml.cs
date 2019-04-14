@@ -1,3 +1,9 @@
+// -----------------------------------------------------------------------
+// <copyright file="Error.cshtml.cs" company="Petabridge, LLC">
+//      Copyright (C) 2015 - 2019 Petabridge, LLC <https://petabridge.com>
+// </copyright>
+// -----------------------------------------------------------------------
+
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 

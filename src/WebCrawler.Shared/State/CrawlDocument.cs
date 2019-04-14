@@ -1,11 +1,17 @@
-﻿using System;
+﻿// -----------------------------------------------------------------------
+// <copyright file="CrawlDocument.cs" company="Petabridge, LLC">
+//      Copyright (C) 2015 - 2019 Petabridge, LLC <https://petabridge.com>
+// </copyright>
+// -----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace WebCrawler.Shared.State
 {
     /// <summary>
-    /// Represents a single document, regardless of content type, discovered but not downloaded
+    ///     Represents a single document, regardless of content type, discovered but not downloaded
     /// </summary>
     public class CrawlDocument : IEquatable<CrawlDocument>
     {
@@ -17,11 +23,13 @@ namespace WebCrawler.Shared.State
         }
 
         /// <summary>
-        /// Absolute URI of the document
+        ///     Absolute URI of the document
         /// </summary>
-        public Uri DocumentUri { get; private set; }
+        public Uri DocumentUri { get; }
 
-        public bool IsImage { get; private set; }
+        public bool IsImage { get; }
+
+        public static IEqualityComparer<CrawlDocument> DocumentUriComparer { get; } = new DocumentUriEqualityComparer();
 
         public bool Equals(CrawlDocument other)
         {
@@ -34,13 +42,13 @@ namespace WebCrawler.Shared.State
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((CrawlDocument) obj);
         }
 
         public override int GetHashCode()
         {
-            return (DocumentUri != null ? DocumentUri.GetHashCode() : 0);
+            return DocumentUri != null ? DocumentUri.GetHashCode() : 0;
         }
 
         private sealed class DocumentUriEqualityComparer : IEqualityComparer<CrawlDocument>
@@ -56,15 +64,8 @@ namespace WebCrawler.Shared.State
 
             public int GetHashCode(CrawlDocument obj)
             {
-                return (obj.DocumentUri != null ? obj.DocumentUri.GetHashCode() : 0);
+                return obj.DocumentUri != null ? obj.DocumentUri.GetHashCode() : 0;
             }
-        }
-
-        private static readonly IEqualityComparer<CrawlDocument> DocumentUriComparerInstance = new DocumentUriEqualityComparer();
-
-        public static IEqualityComparer<CrawlDocument> DocumentUriComparer
-        {
-            get { return DocumentUriComparerInstance; }
         }
     }
 }

@@ -1,16 +1,15 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="TrackerService.cs" company="Petabridge, LLC">
-//      Copyright (C) 2018 - 2018 Petabridge, LLC <https://petabridge.com>
+//      Copyright (C) 2015 - 2019 Petabridge, LLC <https://petabridge.com>
 // </copyright>
 // -----------------------------------------------------------------------
 
 using System.Threading.Tasks;
 using Akka.Actor;
-using Akka.Bootstrap.Docker;
 using WebCrawler.Shared.Config;
+using WebCrawler.Shared.DevOps;
 using WebCrawler.TrackerService.Actors;
 using WebCrawler.TrackerService.Actors.Tracking;
-using WebCrawler.Shared.DevOps;
 
 namespace WebCrawler.TrackerService
 {

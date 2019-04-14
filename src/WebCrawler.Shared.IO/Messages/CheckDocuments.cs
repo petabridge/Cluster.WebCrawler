@@ -1,4 +1,10 @@
-﻿using System;
+﻿// -----------------------------------------------------------------------
+// <copyright file="CheckDocuments.cs" company="Petabridge, LLC">
+//      Copyright (C) 2015 - 2019 Petabridge, LLC <https://petabridge.com>
+// </copyright>
+// -----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Akka.Actor;
@@ -7,9 +13,9 @@ using WebCrawler.Shared.State;
 namespace WebCrawler.Shared.IO.Messages
 {
     /// <summary>
-    /// Message class used to check to see if any of the listed
-    /// <see cref="CrawlDocument"/>s have are currently being processed
-    /// or have previously been processed.
+    ///     Message class used to check to see if any of the listed
+    ///     <see cref="CrawlDocument" />s have are currently being processed
+    ///     or have previously been processed.
     /// </summary>
     public class CheckDocuments
     {
@@ -20,21 +26,27 @@ namespace WebCrawler.Shared.IO.Messages
             Documents = documents;
         }
 
-        public IList<CrawlDocument> Documents { get; private set; }
+        public IList<CrawlDocument> Documents { get; }
 
-        public int HtmlDocs { get { return Documents.Count(x => !x.IsImage); } }
+        public int HtmlDocs
+        {
+            get { return Documents.Count(x => !x.IsImage); }
+        }
 
-        public int Images { get { return Documents.Count(x => x.IsImage); } }
+        public int Images
+        {
+            get { return Documents.Count(x => x.IsImage); }
+        }
 
         /// <summary>
-        /// Reference to the actor who should take on the cleared documents
+        ///     Reference to the actor who should take on the cleared documents
         /// </summary>
-        public IActorRef Requestor { get; private set; }
+        public IActorRef Requestor { get; }
 
         /// <summary>
-        /// The amount of time we think it'll take to crawl this document
-        /// based on current workload.
+        ///     The amount of time we think it'll take to crawl this document
+        ///     based on current workload.
         /// </summary>
-        public TimeSpan? EstimatedCrawlTime { get; private set; }
+        public TimeSpan? EstimatedCrawlTime { get; }
     }
 }

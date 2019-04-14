@@ -1,4 +1,10 @@
-﻿using System;
+// -----------------------------------------------------------------------
+// <copyright file="ActorSystemStartupSpecs.cs" company="Petabridge, LLC">
+//      Copyright (C) 2015 - 2019 Petabridge, LLC <https://petabridge.com>
+// </copyright>
+// -----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Akka.Actor;
@@ -7,7 +13,6 @@ using Akka.HealthCheck;
 using Akka.HealthCheck.Liveness;
 using Akka.HealthCheck.Readiness;
 using Akka.TestKit.Xunit2;
-using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -16,7 +21,9 @@ namespace WebCrawler.Shared.DevOps.Tests
     public class ActorSystemStartupSpecs : TestKit
     {
         public ActorSystemStartupSpecs(ITestOutputHelper helper)
-            : base(Akka.Configuration.Config.Empty.ApplyOpsConfig(), output: helper) { }
+            : base(Akka.Configuration.Config.Empty.ApplyOpsConfig(), output: helper)
+        {
+        }
 
         [Fact(DisplayName = "Instrumented ActorSystem should start HealthChecks automatically")]
         public void ActorSystem_should_start_HealthChecks_automatically()

@@ -1,14 +1,19 @@
-﻿using System;
+﻿// -----------------------------------------------------------------------
+// <copyright file="CrawlStatus.cs" company="Petabridge, LLC">
+//      Copyright (C) 2015 - 2019 Petabridge, LLC <https://petabridge.com>
+// </copyright>
+// -----------------------------------------------------------------------
+
+using System;
 using Akka.Actor;
 using WebCrawler.Shared.Util;
 
 namespace WebCrawler.TrackerService.State
 {
     /// <summary>
-    /// The status of a particular <see cref="CrawlDocument"/> operation.
-    /// 
-    /// If the crawl operatoin isn't completed before the elapsed time, another actor can start
-    /// the process.
+    ///     The status of a particular <see cref="CrawlDocument" /> operation.
+    ///     If the crawl operatoin isn't completed before the elapsed time, another actor can start
+    ///     the process.
     /// </summary>
     public class CrawlStatus
     {
@@ -16,10 +21,7 @@ namespace WebCrawler.TrackerService.State
 
         public Deadline Timeout { get; private set; }
 
-        public bool CanProcess
-        {
-            get { return !IsComplete && (Timeout == null || Timeout.IsOverdue); }
-        }
+        public bool CanProcess => !IsComplete && (Timeout == null || Timeout.IsOverdue);
 
         public IActorRef Owner { get; private set; }
 
