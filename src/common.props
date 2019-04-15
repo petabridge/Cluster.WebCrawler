@@ -2,8 +2,8 @@
   <PropertyGroup>
     <Copyright>Copyright © 2015-2019 Petabridge, LLC</Copyright>
     <Authors>Petabridge</Authors>
-    <VersionPrefix>0.2.6</VersionPrefix>
-    <PackageReleaseNotes>Lengthened throttling window on `DownloadCoordinator`</PackageReleaseNotes>
+    <VersionPrefix>0.2.7</VersionPrefix>
+    <PackageReleaseNotes>Demo change</PackageReleaseNotes>
     <PackageIconUrl>
     </PackageIconUrl>
     <PackageProjectUrl>
