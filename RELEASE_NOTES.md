@@ -1,2 +1,2 @@
-#### 0.2.6 April 14 2019 ####
-* Lengthened throttling window on `DownloadCoordinator`
+#### 0.2.7 April 15 2019 ####
+* Demo change
