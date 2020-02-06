@@ -28,10 +28,11 @@ services:
   webcrawler.web:
     image: webcrawler.web:latest
     ports:
-      - '0:80'
+      - '8808:80'
     environment:
+      ASPNETCORE_ENVIRONMENT: Development
       CLUSTER_SEEDS: "akka.tcp://webcrawler@webcrawler.lighthouse:4053"
-      CLUSTER_PORT: 0
+      CLUSTER_PORT: 4055
     depends_on:
       - "webcrawler.lighthouse"
 
@@ -39,7 +40,7 @@ services:
     image: webcrawler.crawlservice:latest
     environment:
       CLUSTER_SEEDS: "akka.tcp://webcrawler@webcrawler.lighthouse:4053"
-      CLUSTER_PORT: 0
+      CLUSTER_PORT: 4055
     depends_on:
       - "webcrawler.lighthouse"
 
@@ -47,6 +48,6 @@ services:
     image: webcrawler.trackerservice:latest
     environment:
       CLUSTER_SEEDS: "akka.tcp://webcrawler@webcrawler.lighthouse:4053"
-      CLUSTER_PORT: 0
+      CLUSTER_PORT: 4055
     depends_on:
       - "webcrawler.lighthouse"
