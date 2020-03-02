@@ -10,6 +10,7 @@ using System.Text;
 using Akka.Actor;
 using Akka.HealthCheck.Cluster;
 using Akka.HealthCheck;
+using Hocon;
 using Akka.HealthCheck.Liveness;
 using Akka.HealthCheck.Readiness;
 using Akka.TestKit.Xunit2;
@@ -21,7 +22,7 @@ namespace WebCrawler.Shared.DevOps.Tests
     public class ActorSystemStartupSpecs : TestKit
     {
         public ActorSystemStartupSpecs(ITestOutputHelper helper)
-            : base(Akka.Configuration.Config.Empty.ApplyOpsConfig(), output: helper)
+            : base(Hocon.Config.Empty.ApplyOpsConfig(), output: helper)
         {
         }
 

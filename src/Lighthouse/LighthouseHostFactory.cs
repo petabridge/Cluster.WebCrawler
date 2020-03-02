@@ -8,6 +8,7 @@ using System;
 using System.IO;
 using System.Linq;
 using Akka.Actor;
+using Hocon;
 using Akka.Configuration;
 using WebCrawler.Shared.DevOps;
 
@@ -22,11 +23,14 @@ namespace Lighthouse
         {
             var systemName = Environment.GetEnvironmentVariable("ACTORSYSTEM")?.Trim();
 
-            var clusterConfig = ConfigurationFactory.ParseString(File.ReadAllText("akka.hocon")).ApplyOpsConfig();
+            var clusterConfig = ConfigurationFactory.FromFile("akka.hocon").ApplyOpsConfig();
 
-            var lighthouseConfig = clusterConfig.GetConfig("lighthouse");
-            if (lighthouseConfig != null && string.IsNullOrEmpty(systemName))
-                systemName = lighthouseConfig.GetString("actorsystem", systemName);
+            if (string.IsNullOrEmpty(systemName))
+            {
+                var lighthouseConfig = clusterConfig.GetConfig("lighthouse");
+                if (lighthouseConfig != null)
+                    systemName = lighthouseConfig.GetString("actorsystem", systemName);
+            }
 
             var ipAddress = clusterConfig.GetString("akka.remote.dot-netty.tcp.public-hostname");
             var port = clusterConfig.GetInt("akka.remote.dot-netty.tcp.port");
@@ -44,9 +48,8 @@ namespace Lighthouse
 
 
             var seeds = clusterConfig.GetStringList("akka.cluster.seed-nodes").ToList();
-
+            
             Config injectedClusterConfigString = null;
-
 
             if (!seeds.Contains(selfAddress))
             {

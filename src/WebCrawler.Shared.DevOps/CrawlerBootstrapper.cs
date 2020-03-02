@@ -6,7 +6,7 @@
 
 using System;
 using Akka.Actor;
-using Akka.Bootstrap.Docker;
+using Hocon;
 using Petabridge.Cmd.Cluster;
 using Petabridge.Cmd.Host;
 using WebCrawler.Shared.DevOps.Config;
@@ -19,20 +19,16 @@ namespace WebCrawler.Shared.DevOps
     /// </summary>
     public static class CrawlerBootstrapper
     {
-        public static Akka.Configuration.Config ApplyOpsConfig(this Akka.Configuration.Config previousConfig)
+        public static Hocon.Config ApplyOpsConfig(this Hocon.Config previousConfig)
         {
-            var nextConfig = previousConfig.BootstrapFromDocker();
-            return OpsConfig.GetOpsConfig().ApplyPhobosConfig().WithFallback(nextConfig);
+            return OpsConfig.GetOpsConfig().ApplyPhobosConfig().WithFallback(previousConfig);
         }
 
-        public static Akka.Configuration.Config ApplyPhobosConfig(this Akka.Configuration.Config previousConfig)
+        public static Hocon.Config ApplyPhobosConfig(this Hocon.Config previousConfig)
         {
-            var enabledPhobosStr =
-                Environment.GetEnvironmentVariable(OpsConfig.PHOBOS_ENABLED)?.Trim().ToLowerInvariant() ?? "false";
-            if (bool.TryParse(enabledPhobosStr, out var enabledPhobos) && enabledPhobos)
-                return OpsConfig.GetPhobosConfig().WithFallback(previousConfig);
-
-            return previousConfig;
+            return OpsConfig.PhobosEnabled ? 
+                OpsConfig.GetPhobosConfig().WithFallback(previousConfig) : 
+                previousConfig;
         }
 
         /// <summary>

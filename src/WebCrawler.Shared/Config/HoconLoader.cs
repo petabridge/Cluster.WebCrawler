@@ -14,7 +14,7 @@ namespace WebCrawler.Shared.Config
     /// </summary>
     public static class HoconLoader
     {
-        public static Akka.Configuration.Config ParseConfig(string hoconPath)
+        public static Hocon.Config ParseConfig(string hoconPath)
         {
             return ConfigurationFactory.ParseString(File.ReadAllText(hoconPath));
         }
