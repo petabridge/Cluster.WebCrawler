@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:2.1-sdk AS base
+FROM microsoft/dotnet:3.1-sdk AS base
 WORKDIR /app
 
 # should be a comma-delimited list
@@ -9,7 +9,7 @@ ENV CLUSTER_PORT "5212"
 #Akka.Remote inbound listening endpoint
 EXPOSE 5212 
 
-COPY ./bin/Release/netcoreapp2.1/publish/ /app
+COPY ./bin/Release/netcoreapp3.1/publish/ /app
 
 # Install Petabridge.Cmd client
 RUN dotnet tool install --global pbm 

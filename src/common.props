@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <Copyright>Copyright © 2015-2019 Petabridge, LLC</Copyright>
+    <Copyright>Copyright © 2015-2020 Petabridge, LLC</Copyright>
     <Authors>Petabridge</Authors>
     <VersionPrefix>0.2.7</VersionPrefix>
     <PackageReleaseNotes>Demo change</PackageReleaseNotes>
@@ -17,7 +17,7 @@
     <AkkaVersion>1.4.1-rc1</AkkaVersion>
     <HoconVersion>2.0.3</HoconVersion>
     <AkkaHealthCheckVersion>0.3.0-rc1</AkkaHealthCheckVersion>
-    <PetabridgeCmdVersion>0.7.0</PetabridgeCmdVersion>
-    <NetCoreVersion>netcoreapp2.1</NetCoreVersion>
+    <PetabridgeCmdVersion>0.8.0-rc1</PetabridgeCmdVersion>
+    <NetCoreVersion>netcoreapp3.1</NetCoreVersion>
   </PropertyGroup>
 </Project>

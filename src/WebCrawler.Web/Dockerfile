@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:2.1-sdk AS base
+FROM microsoft/dotnet:3.1-sdk AS base
 WORKDIR /app
 
 # should be a comma-delimited list
@@ -18,6 +18,6 @@ ENV PATH="${PATH}:/root/.dotnet/tools"
 
 # RUN pbm help
 
-COPY ./bin/Release/netcoreapp2.1/publish/ /app
+COPY ./bin/Release/netcoreapp3.1/publish/ /app
 
 CMD ["dotnet", "WebCrawler.Web.dll"]

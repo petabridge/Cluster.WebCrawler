@@ -2,7 +2,7 @@ version: '3'
 
 services:
   webcrawler.lighthouse:
-    image: webcrawler.lighthouse:latest
+    image: petabridge/lighthouse:latest
     hostname: webcrawler.lighthouse
     ports:
       - '9110:9110'
