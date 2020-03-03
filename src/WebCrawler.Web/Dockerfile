@@ -12,7 +12,7 @@ EXPOSE 16666
 
 COPY ./bin/Release/netcoreapp3.1/publish/ /app
 
-FROM mcr.microsoft.com/dotnet/core/runtime:3.1 AS app
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS app
 WORKDIR /app
 
 COPY --from=base /app /app
