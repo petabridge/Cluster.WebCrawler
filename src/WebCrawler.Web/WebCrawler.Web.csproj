@@ -2,7 +2,6 @@
   <Import Project="..\common.props" />
   <PropertyGroup>
     <TargetFramework>$(NetCoreVersion)</TargetFramework>
-    <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="web.hocon">
