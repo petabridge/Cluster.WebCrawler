@@ -6,6 +6,7 @@
 
 using System;
 using Akka.Actor;
+using Akka.Bootstrap.Docker;
 using Hocon;
 using Petabridge.Cmd.Cluster;
 using Petabridge.Cmd.Host;
@@ -21,7 +22,8 @@ namespace WebCrawler.Shared.DevOps
     {
         public static Hocon.Config ApplyOpsConfig(this Hocon.Config previousConfig)
         {
-            return OpsConfig.GetOpsConfig().ApplyPhobosConfig().WithFallback(previousConfig);
+            var nextConfig = previousConfig.BootstrapFromDocker();
+            return OpsConfig.GetOpsConfig().ApplyPhobosConfig().WithFallback(nextConfig);
         }
 
         public static Hocon.Config ApplyPhobosConfig(this Hocon.Config previousConfig)

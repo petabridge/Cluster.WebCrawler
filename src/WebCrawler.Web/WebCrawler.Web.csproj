@@ -2,7 +2,6 @@
   <Import Project="..\common.props" />
   <PropertyGroup>
     <TargetFramework>$(NetCoreVersion)</TargetFramework>
-    <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="web.hocon">
@@ -12,7 +11,7 @@
   <ItemGroup>
     <PackageReference Include="Akka.Cluster" Version="$(AkkaVersion)" />
     <PackageReference Include="Akka.HealthCheck.Cluster" Version="$(AkkaHealthCheckVersion)" />
-    <PackageReference Include="Microsoft.AspNetCore.All" />
+    <PackageReference Include="Microsoft.AspNetCore" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup>

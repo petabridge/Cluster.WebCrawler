@@ -27,7 +27,7 @@ namespace WebCrawler.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddMvc(options => options.EnableEndpointRouting = false);
             services.AddSignalR();
             services.AddSingleton<CrawlHubHelper, CrawlHubHelper>();
         }
@@ -38,7 +38,6 @@ namespace WebCrawler.Web
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
             }
             else
             {
