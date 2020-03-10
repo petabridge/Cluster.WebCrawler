@@ -6,14 +6,13 @@
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Config\crawler.DevOps.conf" />
-    <EmbeddedResource Include="Config\crawler.Environment.conf" />
     <EmbeddedResource Include="Config\crawler.Phobos.conf" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Petabridge.Cmd.Cluster" Version="$(PetabridgeCmdVersion)" />
     <PackageReference Include="Akka.HealthCheck.Cluster" Version="$(AkkaHealthCheckVersion)" />
-    <PackageReference Include="Hocon.Configuration" Version="$(HoconVersion)" />
+    <PackageReference Include="Akka.Bootstrap.Docker" Version="$(AkkaBootstrapVersion)" />
     <PackageReference Include="Akka.Bootstrap.Docker" Version="$(AkkaBootstrapVersion)"/>
   </ItemGroup>
 
