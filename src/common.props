@@ -17,7 +17,7 @@
     <AkkaVersion>1.4.5</AkkaVersion>
     <HoconVersion>2.0.3</HoconVersion>
     <AkkaBootstrapVersion>0.4.0</AkkaBootstrapVersion>
-    <AkkaHealthCheckVersion>0.3.0-rc2</AkkaHealthCheckVersion>
+    <AkkaHealthCheckVersion>0.3.0</AkkaHealthCheckVersion>
     <PetabridgeCmdVersion>0.8.0-rc2</PetabridgeCmdVersion>
     <NetCoreVersion>netcoreapp3.1</NetCoreVersion>
   </PropertyGroup>
