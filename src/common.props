@@ -14,7 +14,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <XunitVersion>2.4.1</XunitVersion>
-    <AkkaVersion>1.4.5</AkkaVersion>
+    <AkkaVersion>1.4.6</AkkaVersion>
     <HoconVersion>2.0.3</HoconVersion>
     <AkkaBootstrapVersion>0.4.0</AkkaBootstrapVersion>
     <AkkaHealthCheckVersion>0.3.0</AkkaHealthCheckVersion>
