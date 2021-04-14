@@ -2,7 +2,6 @@
   <Import Project="..\common.props" />
   <PropertyGroup>
     <TargetFramework>$(NetCoreVersion)</TargetFramework>
-    <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="web.hocon">
@@ -12,9 +11,9 @@
   <ItemGroup>
     <PackageReference Include="Akka.Bootstrap.Docker" Version="$(AkkaBootstrapVersion)" />
     <PackageReference Include="Akka.Cluster" Version="$(AkkaVersion)" />
+    <PackageReference Include="Akka.DependencyInjection" Version="$(AkkaVersion)" />
     <PackageReference Include="Akka.HealthCheck.Cluster" Version="$(AkkaHealthCheckVersion)" />
-    <PackageReference Include="Microsoft.AspNetCore.All" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
+    <PackageReference Include="Microsoft.AspNet.SignalR" Version="2.4.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WebCrawler.Shared.DevOps\WebCrawler.Shared.DevOps.csproj" />

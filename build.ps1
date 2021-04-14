@@ -30,13 +30,10 @@ Param(
 )
 
 $FakeVersion = "4.61.2"
-$DotNetChannel = "LTS";
-$DotNetVersion = "2.1.500";
-$DotNetInstallerUri = "https://raw.githubusercontent.com/dotnet/cli/v$DotNetVersion/scripts/obtain/dotnet-install.ps1";
 $NugetVersion = "4.1.0";
 $NugetUrl = "https://dist.nuget.org/win-x86-commandline/v$NugetVersion/nuget.exe"
 $ProtobufVersion = "3.4.0"
-$DocfxVersion = "2.40.5"
+$DocfxVersion = "2.49.0"
 
 # Make sure tools folder exists
 $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent
@@ -44,49 +41,6 @@ $ToolPath = Join-Path $PSScriptRoot "tools"
 if (!(Test-Path $ToolPath)) {
     Write-Verbose "Creating tools directory..."
     New-Item -Path $ToolPath -Type directory | out-null
-}
-
-###########################################################################
-# INSTALL .NET CORE CLI
-###########################################################################
-
-Function Remove-PathVariable([string]$VariableToRemove)
-{
-    $path = [Environment]::GetEnvironmentVariable("PATH", "User")
-    if ($path -ne $null)
-    {
-        $newItems = $path.Split(';', [StringSplitOptions]::RemoveEmptyEntries) | Where-Object { "$($_)" -inotlike $VariableToRemove }
-        [Environment]::SetEnvironmentVariable("PATH", [System.String]::Join(';', $newItems), "User")
-    }
-
-    $path = [Environment]::GetEnvironmentVariable("PATH", "Process")
-    if ($path -ne $null)
-    {
-        $newItems = $path.Split(';', [StringSplitOptions]::RemoveEmptyEntries) | Where-Object { "$($_)" -inotlike $VariableToRemove }
-        [Environment]::SetEnvironmentVariable("PATH", [System.String]::Join(';', $newItems), "Process")
-    }
-}
-
-# Get .NET Core CLI path if installed.
-$FoundDotNetCliVersion = $null;
-if (Get-Command dotnet -ErrorAction SilentlyContinue) {
-    $FoundDotNetCliVersion = dotnet --version;
-    $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
-    $env:DOTNET_CLI_TELEMETRY_OPTOUT=1
-}
-
-if($FoundDotNetCliVersion -ne $DotNetVersion) {
-    $InstallPath = Join-Path $PSScriptRoot ".dotnet"
-    if (!(Test-Path $InstallPath)) {
-        mkdir -Force $InstallPath | Out-Null;
-    }
-    (New-Object System.Net.WebClient).DownloadFile($DotNetInstallerUri, "$InstallPath\dotnet-install.ps1");
-    & $InstallPath\dotnet-install.ps1 -Channel $DotNetChannel -Version $DotNetVersion -InstallDir $InstallPath -Architecture x64;
-
-    Remove-PathVariable "$InstallPath"
-    $env:PATH = "$InstallPath;$env:PATH"
-    $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
-    $env:DOTNET_CLI_TELEMETRY_OPTOUT=1
 }
 
 ###########################################################################
@@ -162,8 +116,8 @@ exit $LASTEXITCODE
 # SIG # Begin signature block
 # MIIgTwYJKoZIhvcNAQcCoIIgQDCCIDwCAQExDzANBglghkgBZQMEAgEFADB5Bgor
 # BgEEAYI3AgEEoGswaTA0BgorBgEEAYI3AgEeMCYCAwEAAAQQH8w7YFlLCE63JNLG
-# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCBE0jzTDwazSHs/
-# gLc53cqa6x5OxdrKHZEi0WVogAAGB6CCDiIwggO3MIICn6ADAgECAhAM5+DlF9hG
+# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCDy+m5x/ontiIGy
+# a2+Kn4J7jbsGsFWkLaQLK39iFQNsb6CCDiIwggO3MIICn6ADAgECAhAM5+DlF9hG
 # /o/lYPwb8DA5MA0GCSqGSIb3DQEBBQUAMGUxCzAJBgNVBAYTAlVTMRUwEwYDVQQK
 # EwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAiBgNV
 # BAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0wNjExMTAwMDAwMDBa
@@ -243,21 +197,21 @@ exit $LASTEXITCODE
 # MRkwFwYDVQQLExB3d3cuZGlnaWNlcnQuY29tMTEwLwYDVQQDEyhEaWdpQ2VydCBT
 # SEEyIEFzc3VyZWQgSUQgQ29kZSBTaWduaW5nIENBAhAMY4mp7C/JJFuk+yoh+Ufk
 # MA0GCWCGSAFlAwQCAQUAoIIBATAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAc
-# BgorBgEEAYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAvBgkqhkiG9w0BCQQxIgQg0DFU
-# zY3cewGAsH9ZZjhiFLYW5Glp0zMuaoMlsrn7OWgwgZQGCisGAQQBgjcCAQwxgYUw
+# BgorBgEEAYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAvBgkqhkiG9w0BCQQxIgQgJuHi
+# vbFHMNp3nUjNSOgj/F89M0Ct8VgVgwOelqhnzlAwgZQGCisGAQQBgjcCAQwxgYUw
 # gYKgSIBGAFAAZQB0AGEAYgByAGkAZABnAGUAIABTAHQAYQBuAGQAYQByAGQAIABC
 # AHUAaQBsAGQAIABUAGUAbQBwAGwAYQB0AGUAc6E2gDRodHRwczovL2dpdGh1Yi5j
 # b20vcGV0YWJyaWRnZS9wZXRhYnJpZGdlLWRvdG5ldC1uZXcgMA0GCSqGSIb3DQEB
-# AQUABIIBAFsY0rzxqAgqJHshWZjNcFQLqJwH58347rVDNnEdQn5rCM9q6MM2eiBp
-# Zi332YaQovEP9qqV15Y9FFKwcfJV2p73Un8hwSZ37NOcT6azZ30XhMNMzWkrQyqJ
-# K1396ueYXS3v7M0PFASJW29BzsQ9QEtB2PAkzoWhfQp/iNjkrPIHiMlnzhEsSGWs
-# WiokkpZIM8McW7ONRQa/IQnqCg35BBIB/p9PkpuexwYeYovb9tcAcorwfbFIzFZI
-# tof8SI9vsjcAzf4f4nR41/hZ0duZX8hIyTpPh4DaPbtOMU+8Drnr1Yvu//iEWFc9
-# 7qwXG3K4XtFjMTgsmWtBuxckFa1ZsZahgg7IMIIOxAYKKwYBBAGCNwMDATGCDrQw
+# AQUABIIBAIJgaaYF7d0eCozYo6KiZYYKU3Qptr33/FYVlEKc6kgh+9D/ZAQ1lqsF
+# k9mZVCB4IbJs92KSNuHhkZpeZjV30YiWJ6Ixd+tF5sAcKfNTSjH3QfqJAdXUG8gL
+# mUbk0H64wz/lTsWLz5l6SrSSnHvABVjn/PqLMRqbrwRvhFFt9yoRlmDzG7/UAPWB
+# +ftkGkPOUUUEIbF/RCdPiXIb82W4cXuBk8Kqkou6X4Dbv07GzKkeCun5DbgD4mL3
+# 2h91fyUsUkh5USpZVcScsLSsIqFavZ3GPExWhkGvo8EQ756+ZT+EdyleQd70eI6V
+# +jrFfrNWxRlmVcfE+ZBH8bLJinzYGNChgg7IMIIOxAYKKwYBBAGCNwMDATGCDrQw
 # gg6wBgkqhkiG9w0BBwKggg6hMIIOnQIBAzEPMA0GCWCGSAFlAwQCAQUAMHcGCyqG
 # SIb3DQEJEAEEoGgEZjBkAgEBBglghkgBhv1sBwEwMTANBglghkgBZQMEAgEFAAQg
-# fBtDTjgZti4UDqtdHBUVyDtp57F2u8SYrrPQA0Zmh1MCECsfBJMEdMeDbontHchr
-# Q8oYDzIwMTgxMjMxMjIyMjE5WqCCC7swggaCMIIFaqADAgECAhAJwPxGyARCE7VZ
+# yVw1M/glzmvyYENKoVDAlG2PPFDPhYSmm6N4s9jIPD0CEGcCUCnVFW/SW5WYFvGQ
+# UdEYDzIwMTkwMzE1MTYwMDU3WqCCC7swggaCMIIFaqADAgECAhAJwPxGyARCE7VZ
 # i68oT05BMA0GCSqGSIb3DQEBCwUAMHIxCzAJBgNVBAYTAlVTMRUwEwYDVQQKEwxE
 # aWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xMTAvBgNVBAMT
 # KERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBUaW1lc3RhbXBpbmcgQ0EwHhcNMTcw
@@ -324,13 +278,13 @@ exit $LASTEXITCODE
 # cnQgSW5jMRkwFwYDVQQLExB3d3cuZGlnaWNlcnQuY29tMTEwLwYDVQQDEyhEaWdp
 # Q2VydCBTSEEyIEFzc3VyZWQgSUQgVGltZXN0YW1waW5nIENBAhAJwPxGyARCE7VZ
 # i68oT05BMA0GCWCGSAFlAwQCAQUAoIGYMBoGCSqGSIb3DQEJAzENBgsqhkiG9w0B
-# CRABBDAcBgkqhkiG9w0BCQUxDxcNMTgxMjMxMjIyMjE5WjArBgsqhkiG9w0BCRAC
+# CRABBDAcBgkqhkiG9w0BCQUxDxcNMTkwMzE1MTYwMDU3WjArBgsqhkiG9w0BCRAC
 # DDEcMBowGDAWBBRAAZFHXJiJHeuhBK9HCRtettTLyzAvBgkqhkiG9w0BCQQxIgQg
-# DuDbP/oIRKuz94N4Kuag2Y1WotWj9oZU0MTaGEa5ynUwDQYJKoZIhvcNAQEBBQAE
-# ggEAS0HrLgkQmG9B2SOTeGrNT1eLdl9Eb9yY1exfb9uQBWQopI66aqTkLr9uyYrc
-# UndjRp391Nxqkw30jr4geLBavjA12fLEY3mzESgMkLiFloavlcUgBdAwW7S7sGgZ
-# D9220Q1/Uk5FniT3LqPWpDEwsMP1u5Ob5mZeb7JbmlbPWkWtwtrO/ledrpCiXuth
-# hzjwwpaWllc33KKa7hykVS6aycrRMWW8UdAF+EYH0qcyLU2LBl+BuhEPhjMjOwm6
-# v7+DDMVeZqIa580kBZHrZhqiZV83DUf9MFevebnc+GgU/1XswzzWqkYPpTb61ySG
-# YQLWggh/qRiHiAmURpgBnqhomQ==
+# jLu5eXUI0j43Sq/ZJ76+UJmWF/2Amb+YAcVtGZhRJKowDQYJKoZIhvcNAQEBBQAE
+# ggEAQBQNwdmatbURcWuntIUvk18FZGGLRA3bT0kNXN0pwwwopQlr4G6WbL8C8oSw
+# 0KUbWa3VonUYHemc6ZYgSOaa07X9dMoEWdgf9Jy7LDFZQCYBkI7034x0ujyTAZ6U
+# KtqQupuRPdLAsCb67KB6DR6lIuP1hj1yolPb9uyqEsH1JJqusTiirZvO1UvNVtHU
+# ljscye8j2SiO8UNLhYHL1me43S4NmqgLkaDvIE8lVx8GtyFyGRdFZYTzAufXTR9H
+# HK8lsD0ekQiOpaAIw/MfhEgTej1Z3L686Z0xwBVyH988UA9lVbXdDZWS3odGd2CT
+# /JdEUFIMzW5J8N+QntZ/Fjua/A==
 # SIG # End signature block

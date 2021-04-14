@@ -14,7 +14,12 @@
   <ItemGroup>
     <PackageReference Include="Akka.Bootstrap.Docker" Version="$(AkkaBootstrapVersion)" />
     <PackageReference Include="Akka.Cluster" Version="$(AkkaVersion)" />
+    <PackageReference Include="Akka.DependencyInjection" Version="$(AkkaVersion)" />
     <PackageReference Include="Akka.HealthCheck.Cluster" Version="$(AkkaHealthCheckVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Configuration" Version="$(MicrosoftExtensionsVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftExtensionsVersion)" />
   </ItemGroup>
 
   <ItemGroup>

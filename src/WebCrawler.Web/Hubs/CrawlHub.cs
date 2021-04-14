@@ -12,9 +12,16 @@ namespace WebCrawler.Web.Hubs
 {
     public class CrawlHub : Hub
     {
+        private readonly ISignalRProcessor _processor;
+
+        public CrawlHub(ISignalRProcessor processor)
+        {
+            _processor = processor;
+        }
+
         public void StartCrawl(string message)
         {
-            SystemActors.SignalRActor.Tell(message, ActorRefs.Nobody);
+            _processor.Deliver(message);
         }
     }
 }

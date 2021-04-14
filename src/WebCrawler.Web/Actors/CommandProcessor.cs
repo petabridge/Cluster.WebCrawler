@@ -34,17 +34,15 @@ namespace WebCrawler.Web.Actors
                 {
                     var startJob = new StartJob(new CrawlJob(new Uri(attempt.RawStr, UriKind.Absolute), true), Sender);
                     CommandRouter.Tell(startJob);
+                    var sender = Sender; // need to close over `Sender` when using `PipeTo`
                     CommandRouter.Ask<Routees>(new GetRoutees()).ContinueWith(tr =>
                     {
                         var grrr =
-                            new SignalRActor.DebugCluster(string.Format("{0} has {1} routees: {2}", CommandRouter,
-                                tr.Result.Members.Count(),
-                                string.Join(",",
-                                    tr.Result.Members.Select(
-                                        y => y.ToString()))));
+                            new SignalRActor.DebugCluster(
+                                $"{CommandRouter} has {tr.Result.Members.Count()} routees: {string.Join(",", tr.Result.Members.Select(y => y.ToString()))}");
 
                         return grrr;
-                    }).PipeTo(Sender);
+                    }).PipeTo(sender);
                     Sender.Tell(startJob);
                 }
                 else

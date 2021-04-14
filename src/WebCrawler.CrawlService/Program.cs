@@ -5,28 +5,34 @@
 // -----------------------------------------------------------------------
 
 using System;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace WebCrawler.CrawlService
 {
     internal class Program
     {
-        private static void Main(string[] args)
+        private static async Task Main(string[] args)
         {
-            var crawlerService = new CrawlerService();
-            crawlerService.Start();
+            
+            var host = new HostBuilder()
+                .ConfigureServices((hostContext, services) =>
+                {
+                    services.AddLogging();
+                    services.AddHostedService<CrawlerService>();
+ 
+                })
+                .ConfigureLogging((hostContext, configLogging) =>
+                {
+                    configLogging.AddConsole();
+ 
+                })
+                .UseConsoleLifetime()
+                .Build();
 
-            AppDomain.CurrentDomain.ProcessExit += (sender, eventArgs) =>
-            {
-                crawlerService.Stop().Wait(TimeSpan.FromSeconds(30));
-            };
-
-            Console.CancelKeyPress += async (sender, eventArgs) =>
-            {
-                await crawlerService.Stop();
-                eventArgs.Cancel = true;
-            };
-
-            crawlerService.WhenTerminated.Wait();
+            await host.RunAsync();
         }
     }
 }

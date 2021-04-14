@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using WebCrawler.Web.Hubs;
 
 namespace WebCrawler.Web
@@ -27,18 +28,23 @@ namespace WebCrawler.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddControllersWithViews();
             services.AddSignalR();
             services.AddSingleton<CrawlHubHelper, CrawlHubHelper>();
+
+            // creates an instance of the ISignalRProcessor that can be handled by SignalR
+            services.AddSingleton<ISignalRProcessor, AkkaService>();
+
+            // starts the IHostedService, which creates the ActorSystem and actors
+            services.AddHostedService<AkkaService>(sp => (AkkaService)sp.GetRequiredService<ISignalRProcessor>());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
             }
             else
             {
@@ -46,16 +52,12 @@ namespace WebCrawler.Web
             }
 
             app.UseStaticFiles();
-
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    "default",
+            app.UseRouting();
+            app.UseEndpoints(ep => {
+                ep.MapControllerRoute("default",
                     "{controller=Home}/{action=Index}/{id?}");
+                ep.MapHub<CrawlHub>("/hubs/crawlHub");
             });
-            app.UseSignalR(builder => { builder.MapHub<CrawlHub>("/hubs/crawlHub"); });
-
-            app.ApplicationServices.GetService<CrawlHubHelper>().StartAsync(CancellationToken.None); //start Akka.NET
         }
     }
 }

@@ -2,7 +2,7 @@ version: '3'
 
 services:
   webcrawler.lighthouse:
-    image: webcrawler.lighthouse:latest
+    image: petabridge/lighthouse:latest
     hostname: webcrawler.lighthouse
     ports:
       - '9110:9110'
@@ -14,13 +14,14 @@ services:
       CLUSTER_SEEDS: "akka.tcp://webcrawler@webcrawler.lighthouse:4053"
 
   webcrawler.lighthouse2:
-    image: webcrawler.lighthouse:latest
+    image: petabridge/lighthouse:latest
     ports:
       - '0:9110'
       - '0:4053'
     environment:
       ACTORSYSTEM: "webcrawler"
       CLUSTER_PORT: 4053
+      CLUSTER_IP: "webcrawler.lighthouse"
       CLUSTER_SEEDS: "akka.tcp://webcrawler@webcrawler.lighthouse:4053"
     depends_on:
       - "webcrawler.lighthouse"
@@ -28,10 +29,11 @@ services:
   webcrawler.web:
     image: webcrawler.web:latest
     ports:
-      - '0:80'
+      - '8808:80'
     environment:
+      ASPNETCORE_ENVIRONMENT: Development
       CLUSTER_SEEDS: "akka.tcp://webcrawler@webcrawler.lighthouse:4053"
-      CLUSTER_PORT: 0
+      CLUSTER_PORT: 4055
     depends_on:
       - "webcrawler.lighthouse"
 
@@ -39,7 +41,7 @@ services:
     image: webcrawler.crawlservice:latest
     environment:
       CLUSTER_SEEDS: "akka.tcp://webcrawler@webcrawler.lighthouse:4053"
-      CLUSTER_PORT: 0
+      CLUSTER_PORT: 4055
     depends_on:
       - "webcrawler.lighthouse"
 
@@ -47,6 +49,6 @@ services:
     image: webcrawler.trackerservice:latest
     environment:
       CLUSTER_SEEDS: "akka.tcp://webcrawler@webcrawler.lighthouse:4053"
-      CLUSTER_PORT: 0
+      CLUSTER_PORT: 4055
     depends_on:
       - "webcrawler.lighthouse"

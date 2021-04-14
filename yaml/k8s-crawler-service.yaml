@@ -31,7 +31,7 @@ spec:
       terminationGracePeriodSeconds: 35
       containers:
       - name: crawler
-        image: webcrawler.crawlservice:0.2.4
+        image: webcrawler.crawlservice:0.3.0
         lifecycle:
           preStop:
             exec:
