@@ -17,13 +17,14 @@ namespace WebCrawler.Web.Actors
     {
         private readonly IActorRef _commandProcessor;
 
-        private CrawlHubHelper _hub;
+        private readonly CrawlHubHelper _hub;
 
-        public SignalRActor(IActorRef commandProcessor)
+        public SignalRActor(IActorRef commandProcessor, CrawlHubHelper hub)
         {
             _commandProcessor = commandProcessor;
+            _hub = hub;
 
-            WaitingForHub();
+            HubAvailable();
         }
 
 
@@ -35,32 +36,18 @@ namespace WebCrawler.Web.Actors
 
             Receive<CommandProcessor.BadCrawlAttempt>(bad =>
             {
-                _hub.CrawlFailed(string.Format("COULD NOT CRAWL {0}: {1}", bad.RawStr, bad.Message));
+                _hub.CrawlFailed($"COULD NOT CRAWL {bad.RawStr}: {bad.Message}");
             });
 
             Receive<IStatusUpdateV1>(status => { _hub.PushStatus(status); });
 
             Receive<IStartJobV1>(start =>
             {
-                _hub.WriteRawMessage(string.Format("Starting crawl of {0}", start.Job.Root.ToString()));
+                _hub.WriteRawMessage($"Starting crawl of {start.Job.Root}");
             });
 
-            Receive<DebugCluster>(debug => { _hub.WriteRawMessage(string.Format("DEBUG: {0}", debug.Message)); });
+            Receive<DebugCluster>(debug => { _hub.WriteRawMessage($"DEBUG: {debug.Message}"); });
         }
-
-        private void WaitingForHub()
-        {
-            Receive<SetHub>(h =>
-            {
-                _hub = h.Hub;
-                Become(HubAvailable);
-                Stash.UnstashAll();
-            });
-
-            ReceiveAny(_ => Stash.Stash());
-        }
-
-        #region Messages
 
         public class DebugCluster
         {
@@ -71,17 +58,5 @@ namespace WebCrawler.Web.Actors
 
             public string Message { get; }
         }
-
-        public class SetHub : INoSerializationVerificationNeeded
-        {
-            public SetHub(CrawlHubHelper hub)
-            {
-                Hub = hub;
-            }
-
-            public CrawlHubHelper Hub { get; }
-        }
-
-        #endregion
     }
 }

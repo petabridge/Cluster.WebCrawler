@@ -15,29 +15,16 @@ using WebCrawler.Web.Actors;
 
 namespace WebCrawler.Web.Hubs
 {
-    /// <inheritdoc />
     /// <summary>
     ///     Necessary for getting access to a hub and passing it along to our actors
     /// </summary>
-    public class CrawlHubHelper : IHostedService
+    public class CrawlHubHelper
     {
         private readonly IHubContext<CrawlHub> _hub;
 
         public CrawlHubHelper(IHubContext<CrawlHub> hub)
         {
             _hub = hub;
-        }
-
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            AkkaStartupTasks.StartAkka();
-            SystemActors.SignalRActor.Tell(new SignalRActor.SetHub(this));
-            return Task.CompletedTask;
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
         }
 
         public void PushStatus(IStatusUpdateV1 update)

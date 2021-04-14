@@ -11,6 +11,7 @@
   <ItemGroup>
     <PackageReference Include="Akka.Bootstrap.Docker" Version="$(AkkaBootstrapVersion)" />
     <PackageReference Include="Akka.Cluster" Version="$(AkkaVersion)" />
+    <PackageReference Include="Akka.DependencyInjection" Version="$(AkkaVersion)" />
     <PackageReference Include="Akka.HealthCheck.Cluster" Version="$(AkkaHealthCheckVersion)" />
     <PackageReference Include="Microsoft.AspNet.SignalR" Version="2.4.1" />
   </ItemGroup>
