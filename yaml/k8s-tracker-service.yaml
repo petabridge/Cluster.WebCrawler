@@ -31,7 +31,7 @@ spec:
       terminationGracePeriodSeconds: 35
       containers:
       - name: tracker
-        image: webcrawler.trackerservice:0.2.7
+        image: webcrawler.trackerservice:0.3.0
         lifecycle:
           preStop:
             exec:

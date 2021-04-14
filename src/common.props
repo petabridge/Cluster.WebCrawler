@@ -2,8 +2,9 @@
   <PropertyGroup>
     <Copyright>Copyright © 2015-2021 Petabridge, LLC</Copyright>
     <Authors>Petabridge</Authors>
-    <VersionPrefix>0.2.7</VersionPrefix>
-    <PackageReleaseNotes>Demo change</PackageReleaseNotes>
+    <VersionPrefix>0.3.0</VersionPrefix>
+    <PackageReleaseNotes>Moved all services to use modern `IHostedService` implementation
+Migrated all Docker images and services to use .NET 5</PackageReleaseNotes>
     <PackageIconUrl>
     </PackageIconUrl>
     <PackageProjectUrl>
