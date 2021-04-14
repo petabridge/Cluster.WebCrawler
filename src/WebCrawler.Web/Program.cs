@@ -4,31 +4,19 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using System;
-using Akka.Actor;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using WebCrawler.Web.Actors;
 
 namespace WebCrawler.Web
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var host = BuildWebHost(args);
 
-            Console.CancelKeyPress += async (sender, eventArgs) =>
-            {
-                var wait = CoordinatedShutdown.Get(SystemActors.ActorSystem)
-                    .Run(CoordinatedShutdown.ClrExitReason.Instance);
-                await host.StopAsync(TimeSpan.FromSeconds(10));
-                await wait;
-            };
-
-
-            host.Run();
-            SystemActors.ActorSystem?.WhenTerminated.Wait();
+            await host.RunAsync();
         }
 
         public static IWebHost BuildWebHost(string[] args)
