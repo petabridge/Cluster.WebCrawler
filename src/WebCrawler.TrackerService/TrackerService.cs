@@ -19,9 +19,9 @@ namespace WebCrawler.TrackerService
 {
     public sealed class TrackerService : IHostedService
     {
-        private IActorRef ApiMaster;
+        private IActorRef _apiMaster;
         private ActorSystem ClusterSystem;
-        private IActorRef DownloadMaster;
+        private IActorRef _downloadMaster;
 
         private readonly IServiceProvider _serviceProvider;
 
@@ -50,8 +50,8 @@ namespace WebCrawler.TrackerService
             ClusterSystem.StartPbm(); // start Petabridge.Cmd (https://cmd.petabridge.com/)
 
             // instantiate actors
-            ApiMaster = ClusterSystem.ActorOf(Props.Create(() => new ApiMaster()), "api");
-            DownloadMaster = ClusterSystem.ActorOf(Props.Create(() => new DownloadsMaster()), "downloads");
+            _apiMaster = ClusterSystem.ActorOf(Props.Create(() => new ApiMaster()), "api");
+            _downloadMaster = ClusterSystem.ActorOf(Props.Create(() => new DownloadsMaster()), "downloads");
             
             return Task.CompletedTask;
         }

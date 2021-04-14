@@ -31,6 +31,12 @@ namespace WebCrawler.Web
             services.AddControllersWithViews();
             services.AddSignalR();
             services.AddSingleton<CrawlHubHelper, CrawlHubHelper>();
+
+            // creates an instance of the ISignalRProcessor that can be handled by SignalR
+            services.AddSingleton<ISignalRProcessor, AkkaService>();
+
+            // starts the IHostedService, which creates the ActorSystem and actors
+            services.AddHostedService<AkkaService>(sp => (AkkaService)sp.GetRequiredService<ISignalRProcessor>());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,8 +58,6 @@ namespace WebCrawler.Web
                     "{controller=Home}/{action=Index}/{id?}");
                 ep.MapHub<CrawlHub>("/hubs/crawlHub");
             });
-
-            app.ApplicationServices.GetService<CrawlHubHelper>().StartAsync(CancellationToken.None); //start Akka.NET
         }
     }
 }
