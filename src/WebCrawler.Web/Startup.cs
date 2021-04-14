@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using WebCrawler.Web.Hubs;
 
 namespace WebCrawler.Web
@@ -27,13 +28,13 @@ namespace WebCrawler.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc(options => options.EnableEndpointRouting = false);
+            services.AddControllersWithViews();
             services.AddSignalR();
             services.AddSingleton<CrawlHubHelper, CrawlHubHelper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -45,14 +46,12 @@ namespace WebCrawler.Web
             }
 
             app.UseStaticFiles();
-
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    "default",
+            app.UseRouting();
+            app.UseEndpoints(ep => {
+                ep.MapControllerRoute("default",
                     "{controller=Home}/{action=Index}/{id?}");
+                ep.MapHub<CrawlHub>("/hubs/crawlHub");
             });
-            app.UseSignalR(builder => { builder.MapHub<CrawlHub>("/hubs/crawlHub"); });
 
             app.ApplicationServices.GetService<CrawlHubHelper>().StartAsync(CancellationToken.None); //start Akka.NET
         }
