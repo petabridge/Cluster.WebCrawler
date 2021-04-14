@@ -20,7 +20,7 @@ jobs:
       - task: UseDotNet@2
         displayName: 'Use .NET 5'
         inputs:
-          version: 5
+          version: '5.x
       # Linux or macOS
       - task: Bash@3 
         displayName: Linux / OSX Build
