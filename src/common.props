@@ -20,5 +20,6 @@
     <AkkaHealthCheckVersion>0.3.1</AkkaHealthCheckVersion>
     <PetabridgeCmdVersion>0.8.3</PetabridgeCmdVersion>
     <NetCoreVersion>net5</NetCoreVersion>
+    <MicrosoftExtensionsVersion>5.0.0</MicrosoftExtensionsVersion>
   </PropertyGroup>
 </Project>

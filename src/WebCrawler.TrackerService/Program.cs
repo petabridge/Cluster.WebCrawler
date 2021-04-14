@@ -5,28 +5,33 @@
 // -----------------------------------------------------------------------
 
 using System;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace WebCrawler.TrackerService
 {
     internal class Program
     {
-        private static void Main(string[] args)
+        private static async Task Main(string[] args)
         {
-            var trackingService = new TrackerService();
-            trackingService.Start();
+            var host = new HostBuilder()
+                .ConfigureServices((hostContext, services) =>
+                {
+                    services.AddLogging();
+                    services.AddHostedService<TrackerService>();
+ 
+                })
+                .ConfigureLogging((hostContext, configLogging) =>
+                {
+                    configLogging.AddConsole();
+ 
+                })
+                .UseConsoleLifetime()
+                .Build();
 
-            AppDomain.CurrentDomain.ProcessExit += (sender, eventArgs) =>
-            {
-                trackingService.Stop().Wait(TimeSpan.FromSeconds(30));
-            };
-
-            Console.CancelKeyPress += async (sender, eventArgs) =>
-            {
-                await trackingService.Stop();
-                eventArgs.Cancel = true;
-            };
-
-            trackingService.WhenTerminated.Wait();
+            await host.RunAsync();
         }
     }
 }
