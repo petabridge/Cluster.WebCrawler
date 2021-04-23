@@ -36,7 +36,7 @@ namespace WebCrawler.Web
             services.AddSingleton<ISignalRProcessor, AkkaService>();
 
             // starts the IHostedService, which creates the ActorSystem and actors
-            services.AddHostedService<AkkaService>(sp => (AkkaService)sp.GetRequiredService<ISignalRProcessor>());
+            services.AddTransient<IHostedService, AkkaService>(sp => (AkkaService)sp.GetRequiredService<ISignalRProcessor>());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
