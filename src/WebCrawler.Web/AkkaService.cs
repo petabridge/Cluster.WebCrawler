@@ -31,9 +31,12 @@ namespace WebCrawler.Web
         private readonly IServiceProvider _serviceProvider;
         private IActorRef _signalRActor;
 
-        public AkkaService(IServiceProvider serviceProvider)
+        private readonly IHostApplicationLifetime _applicationLifetime;
+
+        public AkkaService(IServiceProvider serviceProvider, IHostApplicationLifetime appLifetime)
         {
             _serviceProvider = serviceProvider;
+            _applicationLifetime = appLifetime;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -63,6 +66,11 @@ namespace WebCrawler.Web
                 "commands");
             var signalRProps = ServiceProvider.For(_clusterSystem).Props<SignalRActor>(processor);
             _signalRActor = _clusterSystem.ActorOf(signalRProps, "signalr");
+
+            // add a continuation task that will guarantee shutdown of application if ActorSystem terminates
+            _clusterSystem.WhenTerminated.ContinueWith(tr => {
+                _applicationLifetime.StopApplication();
+            });
 
             return Task.CompletedTask;
         }
