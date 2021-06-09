@@ -25,8 +25,11 @@ namespace WebCrawler.TrackerService
 
         private readonly IServiceProvider _serviceProvider;
 
-        public TrackerService(IServiceProvider sp){
+        private readonly IHostApplicationLifetime _applifetime;
+
+        public TrackerService(IServiceProvider sp, IHostApplicationLifetime applicationLifetime){
             _serviceProvider = sp;
+            _applifetime = applicationLifetime;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -53,6 +56,10 @@ namespace WebCrawler.TrackerService
             _apiMaster = ClusterSystem.ActorOf(Props.Create(() => new ApiMaster()), "api");
             _downloadMaster = ClusterSystem.ActorOf(Props.Create(() => new DownloadsMaster()), "downloads");
             
+            ClusterSystem.WhenTerminated.ContinueWith(tr => {
+                _applifetime.StopApplication();
+            });
+
             return Task.CompletedTask;
         }
 
