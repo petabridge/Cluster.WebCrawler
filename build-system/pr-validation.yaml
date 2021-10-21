@@ -25,7 +25,7 @@ jobs:
     parameters:
       name: 'linux_pr'
       displayName: 'Linux PR Validation'
-      vmImage: 'ubuntu-16.04'
+      vmImage: 'ubuntu-20.04'
       scriptFileName: ./build.sh
       scriptArgs: all
   - template: azure-pipeline.template.yaml
