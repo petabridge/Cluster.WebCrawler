@@ -32,6 +32,6 @@ jobs:
     parameters:
       name: 'docker_build'
       displayName: 'Docker Build'
-      vmImage: 'ubuntu-16.04'
+      vmImage: 'ubuntu-20.04'
       scriptFileName: ./build.sh
       scriptArgs: Docker
