@@ -8,6 +8,9 @@ spec:
   clusterIP: None
   ports:
   - port: 5213
+    name: akka-remote
+  - port: 8558
+    name: management
   selector:
     app: crawler
 ---
@@ -44,11 +47,10 @@ spec:
               fieldPath: metadata.name
         - name: CLUSTER_IP
           value: "$(POD_NAME).crawler"
-        - name: CLUSTER_SEEDS
-          value: akka.tcp://webcrawler@lighthouse-0.lighthouse:4053,akka.tcp://webcrawler@lighthouse-1.lighthouse:4053,akka.tcp://webcrawler@lighthouse-2.lighthouse:4053
         livenessProbe:
           tcpSocket:
             port: 5213
         ports:
+        - containerPort: 8558
         - containerPort: 5213
           protocol: TCP

@@ -14,7 +14,7 @@ COPY ./bin/Release/net5/publish/ /app
 # Install Petabridge.Cmd client
 RUN dotnet tool install --global pbm 
 
-FROM mcr.microsoft.com/dotnet/runtime:5.0 AS app
+FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS app
 WORKDIR /app
 
 COPY --from=base /app /app

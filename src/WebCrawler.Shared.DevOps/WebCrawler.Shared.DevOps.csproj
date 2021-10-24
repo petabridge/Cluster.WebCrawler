@@ -7,13 +7,15 @@
   <ItemGroup>
     <EmbeddedResource Include="Config\crawler.DevOps.conf" />
     <EmbeddedResource Include="Config\crawler.Phobos.conf" />
+    <EmbeddedResource Include="Config\k8sbootstrap.conf" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Petabridge.Cmd.Cluster" Version="$(PetabridgeCmdVersion)" />
     <PackageReference Include="Akka.HealthCheck.Cluster" Version="$(AkkaHealthCheckVersion)" />
     <PackageReference Include="Akka.Bootstrap.Docker" Version="$(AkkaBootstrapVersion)" />
-    <PackageReference Include="Akka.Bootstrap.Docker" Version="$(AkkaBootstrapVersion)"/>
+    <PackageReference Include="Akka.Management.Cluster.Bootstrap" Version="$(AkkaManagementVersion)" />
+    <PackageReference Include="Akka.Discovery.KubernetesApi" Version="$(AkkaManagementVersion)" />
   </ItemGroup>
 
 </Project>

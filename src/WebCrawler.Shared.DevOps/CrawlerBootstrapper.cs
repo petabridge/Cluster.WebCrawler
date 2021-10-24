@@ -7,6 +7,7 @@
 using System;
 using Akka.Actor;
 using Akka.Bootstrap.Docker;
+using Akka.Configuration;
 using Petabridge.Cmd.Cluster;
 using Petabridge.Cmd.Host;
 using WebCrawler.Shared.DevOps.Config;
@@ -19,9 +20,17 @@ namespace WebCrawler.Shared.DevOps
     /// </summary>
     public static class CrawlerBootstrapper
     {
+                
+        public static readonly Akka.Configuration.Config K8sConfig =
+            ConfigurationFactory.FromResource<OpsConfig>("WebCrawler.Shared.DevOps.Config.k8sbootstrap.conf");
+
+        public static readonly Akka.Configuration.Config AkkaManagementConfig = @"
+            extensions = [""Akka.Management.Cluster.Bootstrap.ClusterBootstrapProvider, Akka.Management.Cluster.Bootstrap""]
+        ";
+        
         public static Akka.Configuration.Config ApplyOpsConfig(this Akka.Configuration.Config previousConfig)
         {
-            var nextConfig = previousConfig.BootstrapFromDocker();
+            var nextConfig = AkkaManagementConfig.WithFallback(K8sConfig).WithFallback(previousConfig.BootstrapFromDocker());
             return OpsConfig.GetOpsConfig().ApplyPhobosConfig().WithFallback(nextConfig);
         }
 

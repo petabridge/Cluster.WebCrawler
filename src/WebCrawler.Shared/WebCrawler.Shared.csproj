@@ -6,13 +6,5 @@
 
   <ItemGroup>
     <PackageReference Include="Akka" Version="$(AkkaVersion)" />
-    <PackageReference Include="Akka.Management.Cluster.Bootstrap" Version="$(AkkaManagementVersion)" />
-    <PackageReference Include="Akka.Discovery.KubernetesApi" Version="$(AkkaManagementVersion)" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Bootstrap\k8sbootstrap.conf" />
-    <EmbeddedResource Include="Bootstrap\k8sbootstrap.conf" />
-  </ItemGroup>
-
 </Project>

@@ -1,1 +1,1 @@
-kubectl delete ns clusterbootstrap
+kubectl delete ns webcrawler
