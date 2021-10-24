@@ -115,7 +115,7 @@ namespace WebCrawler.TrackerService.Actors.IO
             Receive<AttemptToStartJob>(start =>
             {
                 var self = Self;
-                CoordinatorRouter.Ask<Routees>(new GetRoutees()).ContinueWith(tr =>
+                CoordinatorRouter.Ask<Routees>(GetRoutees.Instance).ContinueWith(tr =>
                 {
                     return new CrawlCanStart(start.Job, tr.Result.Members.Count());
                 }).PipeTo(self);

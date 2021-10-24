@@ -4,7 +4,9 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using System;
 using Akka.Actor;
+using Microsoft.Extensions.DependencyInjection;
 using WebCrawler.Shared.Commands.V1;
 using WebCrawler.Web.Hubs;
 
@@ -17,12 +19,14 @@ namespace WebCrawler.Web.Actors
     {
         private readonly IActorRef _commandProcessor;
 
+        private IServiceScope _scope;
         private readonly CrawlHubHelper _hub;
 
-        public SignalRActor(IActorRef commandProcessor, CrawlHubHelper hub)
+        public SignalRActor(IActorRef commandProcessor, IServiceProvider sp)
         {
+            _scope = sp.CreateScope();
+            _hub = _scope.ServiceProvider.GetRequiredService<CrawlHubHelper>();
             _commandProcessor = commandProcessor;
-            _hub = hub;
 
             HubAvailable();
         }
@@ -47,6 +51,11 @@ namespace WebCrawler.Web.Actors
             });
 
             Receive<DebugCluster>(debug => { _hub.WriteRawMessage($"DEBUG: {debug.Message}"); });
+        }
+
+        protected override void PostStop()
+        {
+            _scope.Dispose();
         }
 
         public class DebugCluster

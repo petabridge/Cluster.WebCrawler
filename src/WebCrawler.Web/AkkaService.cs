@@ -49,7 +49,7 @@ namespace WebCrawler.Web
             // N.B. `WithActorRefProvider` isn't actually needed here - the HOCON file already specifies Akka.Cluster
 
             // enable DI support inside this ActorSystem, if needed
-            var diSetup = ServiceProviderSetup.Create(_serviceProvider);
+            var diSetup = DependencyResolverSetup.Create(_serviceProvider);
 
             // merge this setup (and any others) together into ActorSystemSetup
             var actorSystemSetup = bootstrap.And(diSetup);
@@ -64,7 +64,7 @@ namespace WebCrawler.Web
             var processor = _clusterSystem.ActorOf(
                 Props.Create(() => new CommandProcessor(router)),
                 "commands");
-            var signalRProps = ServiceProvider.For(_clusterSystem).Props<SignalRActor>(processor);
+            var signalRProps = DependencyResolver.For(_clusterSystem).Props<SignalRActor>(processor);
             _signalRActor = _clusterSystem.ActorOf(signalRProps, "signalr");
 
             // add a continuation task that will guarantee shutdown of application if ActorSystem terminates
