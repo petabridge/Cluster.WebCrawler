@@ -32,14 +32,9 @@ spec:
       labels:
         app: tracker
     spec:
-      terminationGracePeriodSeconds: 35
       containers:
       - name: tracker
         image: webcrawler.trackerservice:0.3.0
-        lifecycle:
-          preStop:
-            exec:
-              command: ["/bin/sh", "-c", "pbm 127.0.0.1:9110 cluster leave"]
         env:
         - name: POD_NAME
           valueFrom:
@@ -47,6 +42,8 @@ spec:
               fieldPath: metadata.name
         - name: CLUSTER_IP
           value: "$(POD_NAME).tracker"
+        - name: CLUSTER_PORT
+          value: "5212"
         livenessProbe:
           tcpSocket:
             port: 5212

@@ -49,14 +49,9 @@ spec:
       labels:
         app: web-cluster
     spec:
-      terminationGracePeriodSeconds: 35
       containers:
       - name: web-cluster
         image: webcrawler.web:0.3.0
-        lifecycle:
-          preStop:
-            exec:
-              command: ["/bin/sh", "-c", "pbm 127.0.0.1:9110 cluster leave"]
         env:
         - name: POD_NAME
           valueFrom:
@@ -64,6 +59,8 @@ spec:
               fieldPath: metadata.name
         - name: CLUSTER_IP
           value: "$(POD_NAME).web-cluster"
+        - name: CLUSTER_PORT
+          value: "16666"
         livenessProbe:
           tcpSocket:
             port: 16666

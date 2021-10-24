@@ -8,6 +8,8 @@ using System;
 using Akka.Actor;
 using Akka.Bootstrap.Docker;
 using Akka.Configuration;
+using Akka.Management;
+using Akka.Management.Cluster.Bootstrap;
 using Petabridge.Cmd.Cluster;
 using Petabridge.Cmd.Host;
 using WebCrawler.Shared.DevOps.Config;
@@ -30,7 +32,9 @@ namespace WebCrawler.Shared.DevOps
         
         public static Akka.Configuration.Config ApplyOpsConfig(this Akka.Configuration.Config previousConfig)
         {
-            var nextConfig = AkkaManagementConfig.WithFallback(K8sConfig).WithFallback(previousConfig.BootstrapFromDocker());
+            var nextConfig = K8sConfig.WithFallback(previousConfig)
+                .WithFallback(ClusterBootstrap.DefaultConfiguration())
+                .WithFallback(AkkaManagementProvider.DefaultConfiguration()).BootstrapFromDocker();
             return OpsConfig.GetOpsConfig().ApplyPhobosConfig().WithFallback(nextConfig);
         }
 
