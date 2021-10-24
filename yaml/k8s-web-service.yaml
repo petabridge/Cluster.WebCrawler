@@ -17,6 +17,7 @@ metadata:
   name: web-cluster
   labels:
     app: web-cluster
+    cluster: webcrawler
 spec:
   serviceName: web-cluster
   replicas: 3

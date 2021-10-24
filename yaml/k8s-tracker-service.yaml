@@ -17,6 +17,7 @@ metadata:
   name: tracker
   labels:
     app: tracker
+    cluster: webcrawler
 spec:
   serviceName: tracker
   replicas: 3

@@ -17,6 +17,7 @@ metadata:
   name: crawler
   labels:
     app: crawler
+    cluster: webcrawler
 spec:
   serviceName: crawler
   replicas: 3
