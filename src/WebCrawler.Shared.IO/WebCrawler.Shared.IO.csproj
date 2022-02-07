@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Akka.Streams" Version="$(AkkaVersion)" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.39" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.42" />
   </ItemGroup>
 
   <ItemGroup>
