@@ -69,6 +69,7 @@ spec:
             port: 80    
         ports:
         - containerPort: 8558
+          name: management
         - containerPort: 16666
           protocol: TCP
         - containerPort: 80

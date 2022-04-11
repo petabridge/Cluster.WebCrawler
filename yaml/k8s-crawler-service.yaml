@@ -49,5 +49,6 @@ spec:
             port: 5213
         ports:
         - containerPort: 8558
+          name: management
         - containerPort: 5213
           protocol: TCP
