@@ -7,7 +7,6 @@
 using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.Cluster.Hosting;
-using Akka.Cluster.Hosting.SBR;
 using Akka.DependencyInjection;
 using Akka.Hosting;
 using Akka.Remote.Hosting;
@@ -85,15 +84,5 @@ namespace WebCrawler.Web
 
             await app.RunAsync();
         }
-
-        /*
-        public static IWebHost BuildWebHost(string[] args)
-        {
-            return WebHost.CreateDefaultBuilder(args)
-                .UseKestrel()
-                .UseStartup<Startup>()
-                .Build();
-        }
-        */
     }
 }

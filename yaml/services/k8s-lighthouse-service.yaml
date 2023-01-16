@@ -31,7 +31,7 @@ spec:
       terminationGracePeriodSeconds: 35
       containers:
       - name: lighthouse
-        image: webcrawler.lighthouse:0.2.7
+        image: petabridge/lighthouse:latest
         lifecycle:
           preStop:
             exec:
@@ -43,6 +43,8 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
+        - name: CLUSTER_PORT
+          value: "4053"
         - name: CLUSTER_IP
           value: "$(POD_NAME).lighthouse"
         - name: CLUSTER_SEEDS

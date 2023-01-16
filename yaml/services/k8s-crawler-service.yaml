@@ -41,13 +41,17 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        - name: CLUSTER_IP
+        - name: CLUSTER__IP
           value: "$(POD_NAME).crawler"
-        - name: CLUSTER_SEEDS
-          value: akka.tcp://webcrawler@lighthouse-0.lighthouse:4053,akka.tcp://webcrawler@lighthouse-1.lighthouse:4053,akka.tcp://webcrawler@lighthouse-2.lighthouse:4053
+        - name: CLUSTER__SEEDS__0
+          value: akka.tcp://webcrawler@lighthouse-0.lighthouse:4053
+        - name: CLUSTER__SEEDS__1
+          value: akka.tcp://webcrawler@lighthouse-1.lighthouse:4053
+        - name: CLUSTER__SEEDS__2
+          value: akka.tcp://webcrawler@lighthouse-2.lighthouse:4053
         livenessProbe:
           tcpSocket:
-            port: 5213
+            port: 11001
         ports:
         - containerPort: 5213
           protocol: TCP

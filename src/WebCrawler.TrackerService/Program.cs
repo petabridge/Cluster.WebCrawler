@@ -38,7 +38,7 @@ namespace WebCrawler.TrackerService
                         builder
                             .AddHoconFile("tracker.hocon", HoconAddMode.Prepend)
                             .AddHocon(hocon: "akka.remote.dot-netty.tcp.maximum-frame-size = 256000b", addMode: HoconAddMode.Prepend)
-                            .WithRemoting(hostname: "127.0.0.1", port: 0)
+                            .WithRemoting(hostname: "127.0.0.1", port: 5212)
                             // Add common DevOps settings
                             .WithOps(
                                 clusterOptions: new ClusterOptions

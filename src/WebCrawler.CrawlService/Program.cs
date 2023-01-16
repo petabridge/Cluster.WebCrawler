@@ -18,26 +18,6 @@ namespace WebCrawler.CrawlService
 {
     internal class Program
     {
-        /*
-             var config = HoconLoader.ParseConfig("crawler.hocon");
-             var bootstrap = BootstrapSetup.Create()
-                .WithConfig(config.ApplyOpsConfig()) // load HOCON and apply extension methods to inject environment variables
-                .WithActorRefProvider(ProviderSelection.Cluster.Instance); // launch Akka.Cluster
-
-            // N.B. `WithActorRefProvider` isn't actually needed here - the HOCON file already specifies Akka.Cluster
-
-            // enable DI support inside this ActorSystem, if needed
-            var diSetup = ServiceProviderSetup.Create(_serviceProvider);
-
-            // merge this setup (and any others) together into ActorSystemSetup
-            var actorSystemSetup = bootstrap.And(diSetup);
-
-            // start ActorSystem
-            ClusterSystem = ActorSystem.Create("webcrawler", actorSystemSetup);
-
-            ClusterSystem.StartPbm(); // start Petabridge.Cmd (https://cmd.petabridge.com/)
- 
-         */
         private static async Task Main(string[] args)
         {
             
@@ -53,7 +33,7 @@ namespace WebCrawler.CrawlService
                     {
                         builder
                             .AddHocon(hocon: "akka.remote.dot-netty.tcp.maximum-frame-size = 256000b", addMode: HoconAddMode.Prepend)
-                            .WithRemoting(hostname: "127.0.0.1", port: 0)
+                            .WithRemoting(hostname: "127.0.0.1", port: 5213)
                             // Add common DevOps settings
                             .WithOps(
                                 clusterOptions: new ClusterOptions
