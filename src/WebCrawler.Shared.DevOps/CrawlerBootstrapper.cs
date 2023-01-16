@@ -4,12 +4,14 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using System;
-using Akka.Actor;
-using Akka.Bootstrap.Docker;
+using Akka.Cluster.Hosting;
+using Akka.Cluster.Hosting.SBR;
+using Akka.Configuration;
+using Akka.HealthCheck.Hosting;
+using Akka.Hosting;
+using Microsoft.Extensions.Configuration;
 using Petabridge.Cmd.Cluster;
 using Petabridge.Cmd.Host;
-using WebCrawler.Shared.DevOps.Config;
 
 namespace WebCrawler.Shared.DevOps
 {
@@ -19,33 +21,90 @@ namespace WebCrawler.Shared.DevOps
     /// </summary>
     public static class CrawlerBootstrapper
     {
-        public static Akka.Configuration.Config ApplyOpsConfig(this Akka.Configuration.Config previousConfig)
-        {
-            var nextConfig = previousConfig.BootstrapFromDocker();
-            return OpsConfig.GetOpsConfig().ApplyPhobosConfig().WithFallback(nextConfig);
-        }
-
-        public static Akka.Configuration.Config ApplyPhobosConfig(this Akka.Configuration.Config previousConfig)
-        {
-            var enabledPhobosStr =
-                Environment.GetEnvironmentVariable(OpsConfig.PHOBOS_ENABLED)?.Trim().ToLowerInvariant() ?? "false";
-            if (bool.TryParse(enabledPhobosStr, out var enabledPhobos) && enabledPhobos)
-                return OpsConfig.GetPhobosConfig().WithFallback(previousConfig);
-
-            return previousConfig;
-        }
+        /// <summary>
+        ///     Name of the config property used to look for Phobos
+        /// </summary>
+        public const string PhobosEnabled = "phobos-enabled";
 
         /// <summary>
-        ///     Start Petabridge.Cmd
+        ///     Name of the config property used to direct Phobos' StatsD
+        ///     output.
         /// </summary>
-        /// <param name="system">The <see cref="ActorSystem" /> that will run Petabridge.Cmd</param>
-        /// <returns>The same <see cref="ActorSystem" /></returns>
-        public static ActorSystem StartPbm(this ActorSystem system)
+        public const string StatsdUrl = "statsd-url";
+
+        /// <summary>
+        ///     Name of the config property used to direct Phobos' StatsD
+        ///     output.
+        /// </summary>
+        public const string StatsdPort = "statsd-port";
+        
+        
+        private static readonly string PetabridgeCmdHocon = @"
+# See petabridge.cmd configuration options here: https://cmd.petabridge.com/articles/install/host-configuration.html
+petabridge.cmd{
+	# default IP address used to listen for incoming petabridge.cmd client connections
+	# should be a safe default as it listens on 'all network interfaces'.
+    host = ""0.0.0.0""
+
+    # default port number used to listen for incoming petabridge.cmd client connections
+    port = 9110
+}";
+        
+        public static ClusterOptions WithOps(this ClusterOptions options)
         {
-            var pbm = PetabridgeCmd.Get(system);
-            pbm.RegisterCommandPalette(ClusterCommands.Instance); // enable cluster management commands
-            pbm.Start();
-            return system;
+            // Akka.Cluster split-brain resolver configurations
+            options.SplitBrainResolver = new KeepMajorityOption();
+            
+            return options;
+        }
+
+        public static AkkaConfigurationBuilder WithOps(this AkkaConfigurationBuilder builder, IConfiguration config)
+        {
+            builder
+                .AddHocon(config, HoconAddMode.Prepend)
+                .BootstrapFromDocker()
+                .AddHocon(PetabridgeCmdHocon, HoconAddMode.Prepend)
+                .AddPetabridgeCmd(pbm =>
+                {
+                    // enable cluster management commands
+                    pbm.RegisterCommandPalette(ClusterCommands.Instance); 
+                })
+                // Not explicitly setting the liveness provider. The Akka.Remote port
+                // is usually an effective-enough tool for this.
+                .WithHealthCheck(opt =>
+                {
+                    // Use a second socket for TCP readiness checks from K8s
+                    opt.Readiness.Transport = HealthCheckTransport.Tcp;
+                    opt.Readiness.TcpPort = 11001;
+                });
+
+            return builder;
+        }
+
+        public static AkkaConfigurationBuilder WithPhobos(this AkkaConfigurationBuilder builder)
+        {
+            if (!builder.Configuration.HasValue)
+                return builder;
+
+            var config = builder.Configuration.Value;
+            if (!config.HasPath(PhobosEnabled) || !config.GetBoolean(PhobosEnabled))
+                return builder;
+            
+            builder.AddHocon(
+                ConfigurationFactory.FromResource<MarkerClass>("WebCrawler.Shared.DevOps.Config.crawler.Phobos.conf"), 
+                HoconAddMode.Prepend);
+
+
+            var statsdUrl = config.GetString(StatsdUrl);
+            var statsDPort = config.GetString(StatsdPort);
+            if (!string.IsNullOrEmpty(statsdUrl) && int.TryParse(statsDPort, out var portNum))
+            {
+                builder.AddHocon(@$"
+phobos.monitoring.statsd.endpoint = ""{statsdUrl}""
+phobos.monitoring.statsd.port={portNum}", HoconAddMode.Prepend);
+            }
+
+            return builder;
         }
     }
 }
