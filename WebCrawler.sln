@@ -25,6 +25,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebCrawler.Shared.DevOps", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebCrawler.Shared.DevOps.Tests", "src\WebCrawler.Shared.DevOps.Tests\WebCrawler.Shared.DevOps.Tests.csproj", "{FED11EA4-D0F5-4B7D-9696-135E61ED3186}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{AF3DC386-7AEE-47AD-AE49-E5A4E35C1574}"
+	ProjectSection(SolutionItems) = preProject
+		src\Directory.Build.props = src\Directory.Build.props
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

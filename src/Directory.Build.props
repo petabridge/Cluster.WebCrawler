@@ -1,0 +1,28 @@
+<Project>
+  <PropertyGroup>
+    <Copyright>Copyright © 2015-2023 Petabridge, LLC</Copyright>
+    <Authors>Petabridge</Authors>
+    <VersionPrefix>0.3.0</VersionPrefix>
+    <PackageReleaseNotes>Moved all services to use modern `IHostedService` implementation
+Migrated all Docker images and services to use .NET 5</PackageReleaseNotes>
+    <PackageIconUrl>
+    </PackageIconUrl>
+    <PackageProjectUrl>
+    </PackageProjectUrl>
+    <PackageLicenseUrl>
+    </PackageLicenseUrl>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <LangVersion>10</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <XunitVersion>2.4.2</XunitVersion>
+    <AkkaVersion>1.4.48</AkkaVersion>
+    <AkkaHostingVersion>1.0.1</AkkaHostingVersion>
+    <HoconVersion>2.0.3</HoconVersion>
+    <AkkaHealthCheckVersion>1.0.0-beta1</AkkaHealthCheckVersion>
+    <PetabridgeCmdVersion>1.2.1</PetabridgeCmdVersion>
+    <NetCoreVersion>net6.0</NetCoreVersion>
+    <NetLibraryVersion>netstandard2.1</NetLibraryVersion>
+    <MicrosoftExtensionsVersion>7.0.0</MicrosoftExtensionsVersion>
+  </PropertyGroup>
+</Project>

@@ -4,14 +4,18 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using System;
+using System.Linq;
+using System.Net;
+using System.Text;
 using Akka.Cluster.Hosting;
 using Akka.Cluster.Hosting.SBR;
-using Akka.Configuration;
 using Akka.HealthCheck.Hosting;
 using Akka.Hosting;
 using Microsoft.Extensions.Configuration;
 using Petabridge.Cmd.Cluster;
 using Petabridge.Cmd.Host;
+using WebCrawler.Shared.DevOps.Config;
 
 namespace WebCrawler.Shared.DevOps
 {
@@ -21,49 +25,16 @@ namespace WebCrawler.Shared.DevOps
     /// </summary>
     public static class CrawlerBootstrapper
     {
-        /// <summary>
-        ///     Name of the config property used to look for Phobos
-        /// </summary>
-        public const string PhobosEnabled = "phobos-enabled";
-
-        /// <summary>
-        ///     Name of the config property used to direct Phobos' StatsD
-        ///     output.
-        /// </summary>
-        public const string StatsdUrl = "statsd-url";
-
-        /// <summary>
-        ///     Name of the config property used to direct Phobos' StatsD
-        ///     output.
-        /// </summary>
-        public const string StatsdPort = "statsd-port";
-        
-        
-        private static readonly string PetabridgeCmdHocon = @"
-# See petabridge.cmd configuration options here: https://cmd.petabridge.com/articles/install/host-configuration.html
-petabridge.cmd{
-	# default IP address used to listen for incoming petabridge.cmd client connections
-	# should be a safe default as it listens on 'all network interfaces'.
-    host = ""0.0.0.0""
-
-    # default port number used to listen for incoming petabridge.cmd client connections
-    port = 9110
-}";
-        
-        public static ClusterOptions WithOps(this ClusterOptions options)
+        public static AkkaConfigurationBuilder WithOps(this AkkaConfigurationBuilder builder, ClusterOptions clusterOptions, IConfiguration config)
         {
             // Akka.Cluster split-brain resolver configurations
-            options.SplitBrainResolver = new KeepMajorityOption();
+            clusterOptions.SplitBrainResolver = new KeepMajorityOption();
             
-            return options;
-        }
-
-        public static AkkaConfigurationBuilder WithOps(this AkkaConfigurationBuilder builder, IConfiguration config)
-        {
             builder
-                .AddHocon(config, HoconAddMode.Prepend)
-                .BootstrapFromDocker()
-                .AddHocon(PetabridgeCmdHocon, HoconAddMode.Prepend)
+                .AddHoconFile("shared.hocon", HoconAddMode.Prepend)
+                .AddHocon(config.GetSection("Akka"), HoconAddMode.Prepend)
+                .WithClustering(clusterOptions)
+                .BootstrapFromDocker(config)
                 .AddPetabridgeCmd(pbm =>
                 {
                     // enable cluster management commands
@@ -81,28 +52,60 @@ petabridge.cmd{
             return builder;
         }
 
-        public static AkkaConfigurationBuilder WithPhobos(this AkkaConfigurationBuilder builder)
+        private static AkkaConfigurationBuilder BootstrapFromDocker(this AkkaConfigurationBuilder builder, IConfiguration configuration)
         {
-            if (!builder.Configuration.HasValue)
-                return builder;
-
-            var config = builder.Configuration.Value;
-            if (!config.HasPath(PhobosEnabled) || !config.GetBoolean(PhobosEnabled))
-                return builder;
+            var section = configuration.GetSection("Cluster");
+            if(!section.GetChildren().Any())
+                Console.WriteLine("Skipping environment variable bootstrap. No 'CLUSTER' section found");
             
-            builder.AddHocon(
-                ConfigurationFactory.FromResource<MarkerClass>("WebCrawler.Shared.DevOps.Config.crawler.Phobos.conf"), 
-                HoconAddMode.Prepend);
-
-
-            var statsdUrl = config.GetString(StatsdUrl);
-            var statsDPort = config.GetString(StatsdPort);
-            if (!string.IsNullOrEmpty(statsdUrl) && int.TryParse(statsDPort, out var portNum))
+            var options = section.Get<DockerOptions>();
+            if (options is null)
             {
-                builder.AddHocon(@$"
-phobos.monitoring.statsd.endpoint = ""{statsdUrl}""
-phobos.monitoring.statsd.port={portNum}", HoconAddMode.Prepend);
+                Console.WriteLine("Skipping environment variable bootstrap. Could not bind IConfiguration to 'DockerOptions'");
+                return builder;
             }
+            
+            var sb = new StringBuilder();
+        
+            // Read CLUSTER__IP variable
+            var ip = options.Ip?.Trim();
+            if (!string.IsNullOrEmpty(ip))
+            {
+                sb.AppendLine($"akka.remote.dot-netty.tcp.public-hostname = {ip}");
+                Console.WriteLine($"From environment: IP: {ip}");
+            }
+            else
+            {
+                sb.AppendLine($"akka.remote.dot-netty.tcp.public-hostname = {Dns.GetHostName()}");
+                Console.WriteLine($"From environment: IP NULL, defaulting to: {Dns.GetHostName()}");
+            }
+        
+            // Read CLUSTER__PORT variable
+            if (options.Port is { })
+            {
+                sb.AppendLine($"akka.remote.dot-netty.tcp.port = {options.Port}");
+                Console.WriteLine($"From environment: PORT: {options.Port}");
+            }
+            else
+            {
+                Console.WriteLine("From environment: PORT: NULL");
+            }
+
+            // Read CLUSTER__SEEDS variable
+            if(options.Seeds is { })
+            {
+                var seeds = string.Join(",", options.Seeds.Select(s => s.ToHocon()));
+                sb.AppendLine(
+                    $"akka.cluster.seed-nodes = [{seeds}]");
+                Console.WriteLine($"From environment: SEEDS: [{seeds}]");
+            }
+            else
+            {
+                Console.WriteLine("From environment: SEEDS: []");
+            }
+
+            if (sb.Length > 0)
+                builder.AddHocon(sb.ToString(), HoconAddMode.Prepend);
 
             return builder;
         }

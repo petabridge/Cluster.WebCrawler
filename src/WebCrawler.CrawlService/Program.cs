@@ -4,20 +4,14 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using System;
 using System.Threading.Tasks;
-using Akka.Bootstrap.Docker;
 using Akka.Cluster.Hosting;
 using Akka.Hosting;
 using Akka.Remote.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.EnvironmentVariables;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Petabridge.Cmd.Cluster;
-using Petabridge.Cmd.Host;
-using WebCrawler.Shared.Config;
 using WebCrawler.Shared.DevOps;
 
 namespace WebCrawler.CrawlService
@@ -58,14 +52,16 @@ namespace WebCrawler.CrawlService
                     services.AddAkka("webcrawler", (builder, provider) =>
                     {
                         builder
-                            .AddHocon("akka.remote.dot-netty.tcp.maximum-frame-size = 256000b", HoconAddMode.Prepend)
+                            .AddHocon(hocon: "akka.remote.dot-netty.tcp.maximum-frame-size = 256000b", addMode: HoconAddMode.Prepend)
                             .WithRemoting(hostname: "127.0.0.1", port: 0)
-                            .WithClustering(new ClusterOptions
-                            {
-                                SeedNodes = new [] { "akka.tcp://webcrawler@localhost:4053" },
-                                Roles = new [] { "crawler" }
-                            }.WithOps())
-                            .WithOps(hostContext.Configuration);
+                            // Add common DevOps settings
+                            .WithOps(
+                                clusterOptions: new ClusterOptions
+                                {
+                                    SeedNodes = new [] { "akka.tcp://webcrawler@localhost:4053" },
+                                    Roles = new [] { "crawler" }
+                                }, 
+                                config: hostContext.Configuration);
                     });
                 })
                 .ConfigureLogging((hostContext, configLogging) =>

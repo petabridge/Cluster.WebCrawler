@@ -43,15 +43,16 @@ namespace WebCrawler.Web
                     services.AddAkka("webcrawler", (builder, provider) =>
                     {
                         builder
-                            .AddHoconFile("web.hocon", HoconAddMode.Prepend)
+                            .AddHoconFile(hoconFilePath: "web.hocon", addMode: HoconAddMode.Prepend)
                             .WithRemoting(hostname: "localhost", port: 16666)
-                            .WithClustering(new ClusterOptions
-                            {
-                                SeedNodes = new[] { "akka.tcp://webcrawler@localhost:4053" },
-                                Roles = new[] { "web" },
-                            }.WithOps())
                             // Add common DevOps settings
-                            .WithOps(provider.GetRequiredService<IConfiguration>())
+                            .WithOps(
+                                clusterOptions: new ClusterOptions
+                                {
+                                    SeedNodes = new[] { "akka.tcp://webcrawler@localhost:4053" },
+                                    Roles = new[] { "web" },
+                                }, 
+                                config: context.Configuration)
                             // Instantiate actors
                             .WithActors((system, registry) =>
                             {
