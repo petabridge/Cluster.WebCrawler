@@ -119,6 +119,7 @@ namespace WebCrawler.Shared.DevOps
                 throw new ConfigurationException("Cluster start up is set to discovery but discovery option is null");
 
             #region Config discovery setup
+            
             if (options.StartupMethod is StartupMethod.ConfigDiscovery )
             {
                 Console.WriteLine("From environment: Forming cluster using Akka.Discovery.Config");
@@ -159,19 +160,33 @@ namespace WebCrawler.Shared.DevOps
             #endregion
 
             #region Kubernetes discovery setup
-            Console.WriteLine("From environment: Forming cluster using Akka.Discovery.KubernetesApi");
-            
             if (options.StartupMethod is not StartupMethod.KubernetesDiscovery)
                 throw new ConfigurationException($"From environment: Unknown startup method: {options.StartupMethod}");
 
+            Console.WriteLine("From environment: Forming cluster using Akka.Discovery.KubernetesApi");
+            
+            builder.WithAkkaManagement(setup =>
+            {
+                setup.Http.HostName = "";
+                setup.Http.Port = 8558;
+            });
+                
             // Add Akka.Management.Cluster.Bootstrap support
             builder
                 .WithClusterBootstrap(setup =>
                 {
-                    setup.ContactPointDiscovery.ServiceName = options.Discovery.ServiceName;
                     setup.ContactPointDiscovery.PortName = "management";
+                    setup.ContactPointDiscovery.RequiredContactPointsNr = 3;
+                    setup.ContactPointDiscovery.StableMargin = TimeSpan.FromSeconds(5);
+                    setup.ContactPointDiscovery.ContactWithAllContactPoints = true;
+                    setup.ContactPointDiscovery.ServiceName = options.Discovery.ServiceName;
                 }, autoStart: true)
-                .WithKubernetesDiscovery();
+                .WithKubernetesDiscovery(opt =>
+                {
+                    opt.PodNamespace = options.Discovery.ServiceName;
+                    opt.PodLabelSelector = "cluster={0}";
+                })
+                .AddHocon(KubernetesDiscovery.DefaultConfiguration(), HoconAddMode.Append);
             
             return builder;
             #endregion

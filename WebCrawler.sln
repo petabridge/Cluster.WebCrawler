@@ -34,7 +34,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{4E722A
 	ProjectSection(SolutionItems) = preProject
 		docker\docker-compose.yml = docker\docker-compose.yml
 		docker\docker-compose-config.yml = docker\docker-compose-config.yml
-		docker\nginx.conf = docker\nginx.conf
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "k8s", "k8s", "{3BA13BDB-25EF-4C02-9DCF-F827DEC1E782}"
@@ -43,6 +42,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "k8s", "k8s", "{3BA13BDB-25E
 		k8s\services\k8s-local-web-loadbalancer.yaml = k8s\services\k8s-local-web-loadbalancer.yaml
 		k8s\services\k8s-tracker-service.yaml = k8s\services\k8s-tracker-service.yaml
 		k8s\services\k8s-web-service.yaml = k8s\services\k8s-web-service.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infrastructure", "infrastructure", "{B7FE9E00-64AD-4F4A-BFA8-1B3059D84367}"
+	ProjectSection(SolutionItems) = preProject
+		k8s\environment\configs\k8s-crd.yaml = k8s\environment\configs\k8s-crd.yaml
+		k8s\environment\configs\k8s-rbac.yaml = k8s\environment\configs\k8s-rbac.yaml
 	EndProjectSection
 EndProject
 Global
@@ -89,5 +94,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{4E722A10-7A86-4BAE-9769-4D3930A54AF3} = {AF3DC386-7AEE-47AD-AE49-E5A4E35C1574}
 		{3BA13BDB-25EF-4C02-9DCF-F827DEC1E782} = {AF3DC386-7AEE-47AD-AE49-E5A4E35C1574}
+		{B7FE9E00-64AD-4F4A-BFA8-1B3059D84367} = {3BA13BDB-25EF-4C02-9DCF-F827DEC1E782}
 	EndGlobalSection
 EndGlobal
