@@ -17,6 +17,7 @@ using Akka.HealthCheck.Hosting;
 using Akka.Hosting;
 using Akka.Management;
 using Akka.Management.Cluster.Bootstrap;
+using Akka.Remote.Hosting;
 using Microsoft.Extensions.Configuration;
 using Petabridge.Cmd.Cluster;
 using Petabridge.Cmd.Host;
@@ -33,6 +34,7 @@ namespace WebCrawler.Shared.DevOps
     {
         public static AkkaConfigurationBuilder WithOps(
             this AkkaConfigurationBuilder builder,
+            RemoteOptions remoteOptions,
             Akka.Cluster.Hosting.ClusterOptions clusterOptions,
             IConfiguration config)
         {
@@ -43,11 +45,52 @@ namespace WebCrawler.Shared.DevOps
             
             // Clear seed nodes if we're using Config or Kubernetes Discovery
             if (options is { StartupMethod: StartupMethod.ConfigDiscovery or StartupMethod.KubernetesDiscovery })
+            {
+                clusterOptions.SeedNodes = null;
                 options.Seeds = null;
+            }
+            
+            // Setup remoting
+            // Reads environment variable CLUSTER__PORT
+            if (options is { Port: { } })
+            {
+                Console.WriteLine($"From environment: PORT: {options.Port}");
+                remoteOptions.Port = options.Port;
+            }
+            else
+            {
+                Console.WriteLine($"From environment: PORT: NULL. Using tcp port: {remoteOptions.Port}");
+            }
+
+            // Reads environment variable CLUSTER__IP
+            if (options is { Ip: { } })
+            {
+                var ip = options.Ip.Trim();
+                remoteOptions.PublicHostName = ip;
+                Console.WriteLine($"From environment: IP: {ip}");
+            }
+            else
+            {
+                Console.WriteLine($"From environment: IP NULL, defaulting to: {Dns.GetHostName().ToHocon()}");
+                remoteOptions.PublicHostName = Dns.GetHostName().ToHocon();
+            }
+
+            if (options is { Seeds: { } })
+            {
+                var seeds = string.Join(",", options.Seeds.Select(s => s.ToHocon()));
+                clusterOptions.SeedNodes = options.Seeds;
+                Console.WriteLine($"From environment: SEEDS: [{seeds}]");
+            }
+            else
+            {
+                Console.WriteLine($"From environment: SEEDS: NULL, using seeds: [{string.Join(", ", clusterOptions.SeedNodes ?? new []{ "" })}]");
+            }
+
             
             builder
                 .AddHoconFile("shared.hocon", HoconAddMode.Prepend)
                 .AddHocon(config.GetSection("Akka"), HoconAddMode.Prepend)
+                .WithRemoting(remoteOptions)
                 .WithClustering(clusterOptions)
                 .SetupFromEnvironment(options)
                 .AddPetabridgeCmd(pbm =>
@@ -67,7 +110,7 @@ namespace WebCrawler.Shared.DevOps
             // No need to setup seed based cluster
             if (options is null or { StartupMethod: StartupMethod.SeedNodes })
             {
-                Console.WriteLine("Forming cluster using seed nodes");
+                Console.WriteLine("From environment: Forming cluster using seed nodes");
                 return builder;
             }
 
@@ -77,25 +120,37 @@ namespace WebCrawler.Shared.DevOps
             #region Config discovery setup
             if (options.StartupMethod is StartupMethod.ConfigDiscovery )
             {
-                Console.WriteLine("Forming cluster using Akka.Discovery.Config");
+                Console.WriteLine("From environment: Forming cluster using Akka.Discovery.Config");
                 
-                // Add Akka.Management.Cluster.Bootstrap support
                 if (options.Discovery.ConfigEndpoints is null)
                     throw new ConfigurationException(
                         "Cluster start up is set to configuration discovery but discovery endpoints is null");
 
+                builder.WithAkkaManagement(setup =>
+                {
+                    setup.Http.HostName = options.Ip ?? Dns.GetHostName();
+                    setup.Http.Port = 8558;
+                    setup.Http.BindHostName = "0.0.0.0";
+                    setup.Http.BindPort = 8558;
+                });
+                
+                // Add Akka.Management.Cluster.Bootstrap support
                 builder.WithClusterBootstrap(setup =>
                 {
                     setup.ContactPointDiscovery.ServiceName = options.Discovery.ServiceName;
                 }, autoStart: true);
                 
                 var configOptions = options.Discovery;
+                var endpoints = string.Join(",", configOptions.ConfigEndpoints.Select(s => s.ToHocon()));
+                Console.WriteLine($"From environment: Using config based discovery endpoints: [{endpoints}]");
+                
                 var sb = new StringBuilder();
                 sb.AppendLine("akka.discovery.method = config");
-                sb.AppendLine(
-                    $"akka.discovery.config.services.{configOptions.ServiceName}.endpoints = [" +
-                    $"{string.Join(",", configOptions.ConfigEndpoints?.Select(s => s.ToHocon()) ?? new[] { "" })}" +
-                    "]");
+                sb.AppendLine("akka.discovery.config {");
+                sb.AppendLine("class = \"Akka.Discovery.Config.ConfigServiceDiscovery, Akka.Discovery\"");
+                sb.AppendLine("services-path = \"akka.discovery.config.services\"");
+                sb.AppendLine($"services.{configOptions.ServiceName}.endpoints = [{endpoints}]");
+                sb.AppendLine("}");
                 
                 builder.AddHocon(sb.ToString(), HoconAddMode.Prepend);
                 return builder;
@@ -103,10 +158,10 @@ namespace WebCrawler.Shared.DevOps
             #endregion
 
             #region Kubernetes discovery setup
-            Console.WriteLine("Forming cluster using Akka.Discovery.KubernetesApi");
+            Console.WriteLine("From environment: Forming cluster using Akka.Discovery.KubernetesApi");
             
             if (options.StartupMethod is not StartupMethod.KubernetesDiscovery)
-                throw new ConfigurationException($"Unknown startup method: {options.StartupMethod}");
+                throw new ConfigurationException($"From environment: Unknown startup method: {options.StartupMethod}");
 
             // Add Akka.Management.Cluster.Bootstrap support
             builder
@@ -149,30 +204,6 @@ namespace WebCrawler.Shared.DevOps
             
             var sb = new StringBuilder();
         
-            // Read CLUSTER__IP variable
-            var ip = options.Ip?.Trim();
-            if (!string.IsNullOrEmpty(ip))
-            {
-                sb.AppendLine($"akka.remote.dot-netty.tcp.public-hostname = {ip.ToHocon()}");
-                Console.WriteLine($"From environment: IP: {ip}");
-            }
-            else
-            {
-                sb.AppendLine($"akka.remote.dot-netty.tcp.public-hostname = {Dns.GetHostName().ToHocon()}");
-                Console.WriteLine($"From environment: IP NULL, defaulting to: {Dns.GetHostName().ToHocon()}");
-            }
-        
-            // Read CLUSTER__PORT variable
-            if (options.Port is { })
-            {
-                sb.AppendLine($"akka.remote.dot-netty.tcp.port = {options.Port}");
-                Console.WriteLine($"From environment: PORT: {options.Port}");
-            }
-            else
-            {
-                Console.WriteLine("From environment: PORT: NULL");
-            }
-
             // Read CLUSTER__SEEDS variable
             if(options.Seeds is { })
             {
@@ -183,7 +214,6 @@ namespace WebCrawler.Shared.DevOps
             }
             else
             {
-                Console.WriteLine("From environment: SEEDS: []");
             }
 
             if (sb.Length > 0)

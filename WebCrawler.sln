@@ -33,6 +33,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{4E722A10-7A86-4BAE-9769-4D3930A54AF3}"
 	ProjectSection(SolutionItems) = preProject
 		docker\docker-compose.yml = docker\docker-compose.yml
+		docker\docker-compose-config.yml = docker\docker-compose-config.yml
+		docker\nginx.conf = docker\nginx.conf
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "k8s", "k8s", "{3BA13BDB-25EF-4C02-9DCF-F827DEC1E782}"
