@@ -5,8 +5,14 @@
 // -----------------------------------------------------------------------
 
 using System;
-using Akka.Actor;
-using Akka.Bootstrap.Docker;
+using System.Linq;
+using System.Net;
+using System.Text;
+using Akka.Cluster.Hosting;
+using Akka.Cluster.Hosting.SBR;
+using Akka.HealthCheck.Hosting;
+using Akka.Hosting;
+using Microsoft.Extensions.Configuration;
 using Petabridge.Cmd.Cluster;
 using Petabridge.Cmd.Host;
 using WebCrawler.Shared.DevOps.Config;
@@ -19,33 +25,89 @@ namespace WebCrawler.Shared.DevOps
     /// </summary>
     public static class CrawlerBootstrapper
     {
-        public static Akka.Configuration.Config ApplyOpsConfig(this Akka.Configuration.Config previousConfig)
+        public static AkkaConfigurationBuilder WithOps(this AkkaConfigurationBuilder builder, ClusterOptions clusterOptions, IConfiguration config)
         {
-            var nextConfig = previousConfig.BootstrapFromDocker();
-            return OpsConfig.GetOpsConfig().ApplyPhobosConfig().WithFallback(nextConfig);
+            // Akka.Cluster split-brain resolver configurations
+            clusterOptions.SplitBrainResolver = new KeepMajorityOption();
+            
+            builder
+                .AddHoconFile("shared.hocon", HoconAddMode.Prepend)
+                .AddHocon(config.GetSection("Akka"), HoconAddMode.Prepend)
+                .WithClustering(clusterOptions)
+                .BootstrapFromDocker(config)
+                .AddPetabridgeCmd(pbm =>
+                {
+                    // enable cluster management commands
+                    pbm.RegisterCommandPalette(ClusterCommands.Instance); 
+                })
+                // Not explicitly setting the liveness provider. The Akka.Remote port
+                // is usually an effective-enough tool for this.
+                .WithHealthCheck(opt =>
+                {
+                    // Use a second socket for TCP readiness checks from K8s
+                    opt.Readiness.Transport = HealthCheckTransport.Tcp;
+                    opt.Readiness.TcpPort = 11001;
+                });
+
+            return builder;
         }
 
-        public static Akka.Configuration.Config ApplyPhobosConfig(this Akka.Configuration.Config previousConfig)
+        private static AkkaConfigurationBuilder BootstrapFromDocker(this AkkaConfigurationBuilder builder, IConfiguration configuration)
         {
-            var enabledPhobosStr =
-                Environment.GetEnvironmentVariable(OpsConfig.PHOBOS_ENABLED)?.Trim().ToLowerInvariant() ?? "false";
-            if (bool.TryParse(enabledPhobosStr, out var enabledPhobos) && enabledPhobos)
-                return OpsConfig.GetPhobosConfig().WithFallback(previousConfig);
+            var section = configuration.GetSection("Cluster");
+            if(!section.GetChildren().Any())
+                Console.WriteLine("Skipping environment variable bootstrap. No 'CLUSTER' section found");
+            
+            var options = section.Get<DockerOptions>();
+            if (options is null)
+            {
+                Console.WriteLine("Skipping environment variable bootstrap. Could not bind IConfiguration to 'DockerOptions'");
+                return builder;
+            }
+            
+            var sb = new StringBuilder();
+        
+            // Read CLUSTER__IP variable
+            var ip = options.Ip?.Trim();
+            if (!string.IsNullOrEmpty(ip))
+            {
+                sb.AppendLine($"akka.remote.dot-netty.tcp.public-hostname = {ip}");
+                Console.WriteLine($"From environment: IP: {ip}");
+            }
+            else
+            {
+                sb.AppendLine($"akka.remote.dot-netty.tcp.public-hostname = {Dns.GetHostName()}");
+                Console.WriteLine($"From environment: IP NULL, defaulting to: {Dns.GetHostName()}");
+            }
+        
+            // Read CLUSTER__PORT variable
+            if (options.Port is { })
+            {
+                sb.AppendLine($"akka.remote.dot-netty.tcp.port = {options.Port}");
+                Console.WriteLine($"From environment: PORT: {options.Port}");
+            }
+            else
+            {
+                Console.WriteLine("From environment: PORT: NULL");
+            }
 
-            return previousConfig;
-        }
+            // Read CLUSTER__SEEDS variable
+            if(options.Seeds is { })
+            {
+                var seeds = string.Join(",", options.Seeds.Select(s => s.ToHocon()));
+                sb.AppendLine(
+                    $"akka.cluster.seed-nodes = [{seeds}]");
+                Console.WriteLine($"From environment: SEEDS: [{seeds}]");
+            }
+            else
+            {
+                Console.WriteLine("From environment: SEEDS: []");
+            }
 
-        /// <summary>
-        ///     Start Petabridge.Cmd
-        /// </summary>
-        /// <param name="system">The <see cref="ActorSystem" /> that will run Petabridge.Cmd</param>
-        /// <returns>The same <see cref="ActorSystem" /></returns>
-        public static ActorSystem StartPbm(this ActorSystem system)
-        {
-            var pbm = PetabridgeCmd.Get(system);
-            pbm.RegisterCommandPalette(ClusterCommands.Instance); // enable cluster management commands
-            pbm.Start();
-            return system;
+            if (sb.Length > 0)
+                builder.AddHocon(sb.ToString(), HoconAddMode.Prepend);
+
+            return builder;
         }
     }
 }

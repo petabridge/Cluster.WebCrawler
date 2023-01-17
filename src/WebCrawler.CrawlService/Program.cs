@@ -4,11 +4,15 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using System;
 using System.Threading.Tasks;
+using Akka.Cluster.Hosting;
+using Akka.Hosting;
+using Akka.Remote.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using WebCrawler.Shared.DevOps;
 
 namespace WebCrawler.CrawlService
 {
@@ -18,16 +22,31 @@ namespace WebCrawler.CrawlService
         {
             
             var host = new HostBuilder()
+                .ConfigureHostConfiguration(config =>
+                {
+                    config.AddEnvironmentVariables();
+                })
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddLogging();
-                    services.AddHostedService<CrawlerService>();
- 
+                    services.AddAkka("webcrawler", (builder, provider) =>
+                    {
+                        builder
+                            .AddHocon(hocon: "akka.remote.dot-netty.tcp.maximum-frame-size = 256000b", addMode: HoconAddMode.Prepend)
+                            .WithRemoting(hostname: "127.0.0.1", port: 5213)
+                            // Add common DevOps settings
+                            .WithOps(
+                                clusterOptions: new ClusterOptions
+                                {
+                                    SeedNodes = new [] { "akka.tcp://webcrawler@localhost:4053" },
+                                    Roles = new [] { "crawler" }
+                                }, 
+                                config: hostContext.Configuration);
+                    });
                 })
                 .ConfigureLogging((hostContext, configLogging) =>
                 {
                     configLogging.AddConsole();
- 
                 })
                 .UseConsoleLifetime()
                 .Build();

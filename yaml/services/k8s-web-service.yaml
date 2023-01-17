@@ -7,7 +7,12 @@ metadata:
 spec:
   clusterIP: None
   ports:
+  - port: 80
+    name: http
+  - port: 8228
+    name: management
   - port: 16666
+    name: akka-remote
   selector:
     app: web-cluster
 ---
@@ -41,13 +46,19 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        - name: CLUSTER_IP
+        - name: CLUSTER__PORT
+          value: "16666"
+        - name: CLUSTER__IP
           value: "$(POD_NAME).web-cluster"
-        - name: CLUSTER_SEEDS
-          value: akka.tcp://webcrawler@lighthouse-0.lighthouse:4053,akka.tcp://webcrawler@lighthouse-1.lighthouse:4053,akka.tcp://webcrawler@lighthouse-2.lighthouse:4053
+        - name: CLUSTER__SEEDS__0
+          value: "akka.tcp://webcrawler@lighthouse-0.lighthouse:4053"
+        - name: CLUSTER__SEEDS__1
+          value: "akka.tcp://webcrawler@lighthouse-1.lighthouse:4053"
+        - name: CLUSTER__SEEDS__2
+          value: "akka.tcp://webcrawler@lighthouse-2.lighthouse:4053"
         livenessProbe:
           tcpSocket:
-            port: 16666
+            port: 11001
         readinessProbe:
           tcpSocket: 
             port: 80    
