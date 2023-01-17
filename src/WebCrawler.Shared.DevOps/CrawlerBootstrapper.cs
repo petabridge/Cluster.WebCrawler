@@ -40,11 +40,12 @@ namespace WebCrawler.Shared.DevOps
         {
             // Akka.Cluster split-brain resolver configurations
             clusterOptions.SplitBrainResolver = new KeepMajorityOption();
-            
+
+            #region Environment variable setup
+
             var options = GetEnvironmentVariables(config);
-            
             // Clear seed nodes if we're using Config or Kubernetes Discovery
-            if (options is { StartupMethod: StartupMethod.ConfigDiscovery or StartupMethod.KubernetesDiscovery })
+            if (options.StartupMethod is StartupMethod.ConfigDiscovery or StartupMethod.KubernetesDiscovery )
             {
                 clusterOptions.SeedNodes = null;
                 options.Seeds = null;
@@ -52,7 +53,7 @@ namespace WebCrawler.Shared.DevOps
             
             // Setup remoting
             // Reads environment variable CLUSTER__PORT
-            if (options is { Port: { } })
+            if (options.Port is { })
             {
                 Console.WriteLine($"From environment: PORT: {options.Port}");
                 remoteOptions.Port = options.Port;
@@ -63,7 +64,7 @@ namespace WebCrawler.Shared.DevOps
             }
 
             // Reads environment variable CLUSTER__IP
-            if (options is { Ip: { } })
+            if (options.Ip is { })
             {
                 var ip = options.Ip.Trim();
                 remoteOptions.PublicHostName = ip;
@@ -75,7 +76,7 @@ namespace WebCrawler.Shared.DevOps
                 remoteOptions.PublicHostName = Dns.GetHostName().ToHocon();
             }
 
-            if (options is { Seeds: { } })
+            if (options.Seeds is { })
             {
                 var seeds = string.Join(",", options.Seeds.Select(s => s.ToHocon()));
                 clusterOptions.SeedNodes = options.Seeds;
@@ -86,13 +87,13 @@ namespace WebCrawler.Shared.DevOps
                 Console.WriteLine($"From environment: SEEDS: NULL, using seeds: [{string.Join(", ", clusterOptions.SeedNodes ?? new []{ "" })}]");
             }
 
-            
+            #endregion
+
             builder
                 .AddHoconFile("shared.hocon", HoconAddMode.Prepend)
                 .AddHocon(config.GetSection("Akka"), HoconAddMode.Prepend)
                 .WithRemoting(remoteOptions)
                 .WithClustering(clusterOptions)
-                .SetupFromEnvironment(options)
                 .AddPetabridgeCmd(pbm =>
                 {
                     // enable cluster management commands
@@ -108,7 +109,7 @@ namespace WebCrawler.Shared.DevOps
                 });
 
             // No need to setup seed based cluster
-            if (options is null or { StartupMethod: StartupMethod.SeedNodes })
+            if (options.StartupMethod is null or StartupMethod.SeedNodes)
             {
                 Console.WriteLine("From environment: Forming cluster using seed nodes");
                 return builder;
@@ -176,50 +177,23 @@ namespace WebCrawler.Shared.DevOps
             #endregion
         }
 
-        private static ClusterOptions? GetEnvironmentVariables(IConfiguration configuration)
+        private static ClusterOptions GetEnvironmentVariables(IConfiguration configuration)
         {
             var section = configuration.GetSection("Cluster");
             if(!section.GetChildren().Any())
             {
                 Console.WriteLine("Skipping environment variable bootstrap. No 'CLUSTER' section found");
-                return null;
+                return new ClusterOptions();
             }
             
             var options = section.Get<ClusterOptions>();
             if (options is null)
             {
                 Console.WriteLine("Skipping environment variable bootstrap. Could not bind IConfiguration to 'DockerOptions'");
-                return null;
+                return new ClusterOptions();
             }
 
             return options;
-        }
-        
-        private static AkkaConfigurationBuilder SetupFromEnvironment(
-            this AkkaConfigurationBuilder builder, ClusterOptions? options)
-        {
-            // Skip if there are no environment setup 
-            if (options is null)
-                return builder;
-            
-            var sb = new StringBuilder();
-        
-            // Read CLUSTER__SEEDS variable
-            if(options.Seeds is { })
-            {
-                var seeds = string.Join(",", options.Seeds.Select(s => s.ToHocon()));
-                sb.AppendLine(
-                    $"akka.cluster.seed-nodes = [{seeds}]");
-                Console.WriteLine($"From environment: SEEDS: [{seeds}]");
-            }
-            else
-            {
-            }
-
-            if (sb.Length > 0)
-                builder.AddHocon(sb.ToString(), HoconAddMode.Prepend);
-
-            return builder;
         }
     }
 }
