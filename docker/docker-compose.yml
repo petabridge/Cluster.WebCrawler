@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  webcrawler.web:
+    image: webcrawler.web:latest
+    hostname: webcrawler.web
+    ports:
+      - '9110:9110'
+      - '4055:4055'
+      - '8080:80'
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      CLUSTER__IP: "webcrawler.web"
+      CLUSTER__PORT: 4055
+      CLUSTER__SEEDS__0: "akka.tcp://webcrawler@webcrawler.web:4055"
+      CLUSTER__STARTUPMETHOD: "SeedNodes"
+
+  webcrawler.crawlservice:
+    image: webcrawler.crawlservice:latest
+    deploy:
+      replicas: 3
+    environment:
+      CLUSTER__SEEDS__0: "akka.tcp://webcrawler@webcrawler.web:4055"
+      CLUSTER__PORT: 4055
+      CLUSTER__STARTUPMETHOD: "SeedNodes"
+    depends_on:
+      - "webcrawler.web"
+
+  webcrawler.trackerservice:
+    image: webcrawler.trackerservice:latest
+    deploy:
+      replicas: 3
+    environment:
+      CLUSTER__SEEDS__0: "akka.tcp://webcrawler@webcrawler.web:4055"
+      CLUSTER__PORT: 4055
+      CLUSTER__STARTUPMETHOD: "SeedNodes"
+    depends_on:
+      - "webcrawler.web"

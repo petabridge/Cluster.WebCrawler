@@ -41,9 +41,14 @@ namespace WebCrawler.TrackerService
                             .WithRemoting(hostname: "127.0.0.1", port: 5212)
                             // Add common DevOps settings
                             .WithOps(
+                                remoteOptions: new RemoteOptions
+                                {
+                                    HostName = "0.0.0.0",
+                                    Port = 5212
+                                },
                                 clusterOptions: new ClusterOptions
                                 {
-                                    SeedNodes = new[] { "akka.tcp://webcrawler@localhost:4053" },
+                                    SeedNodes = new[] { "akka.tcp://webcrawler@localhost:16666" },
                                     Roles = new[] { "tracker" }
                                 }, 
                                 config: hostContext.Configuration)

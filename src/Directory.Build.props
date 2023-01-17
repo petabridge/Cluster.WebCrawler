@@ -12,6 +12,7 @@ Migrated all Docker images and services to use .NET 5</PackageReleaseNotes>
     <PackageLicenseUrl>
     </PackageLicenseUrl>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <Nullable>enable</Nullable>
     <LangVersion>10</LangVersion>
   </PropertyGroup>
   <PropertyGroup>

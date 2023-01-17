@@ -2,7 +2,7 @@
 REM deploys all Kubernetes services to their staging environment
 
 set namespace=webcrawler
-set location=%~dp0/environment
+set location=%~dp0environment
 
 echo "Deploying K8s resources from [%location%] into namespace [%namespace%]"
 
