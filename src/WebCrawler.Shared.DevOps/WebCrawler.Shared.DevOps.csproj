@@ -11,7 +11,7 @@
     <PackageReference Include="Akka.Cluster.Hosting" Version="$(AkkaHostingVersion)" />
     <PackageReference Include="Akka.Discovery.KubernetesApi" Version="1.0.0-beta2" />
     <PackageReference Include="Akka.HealthCheck.Hosting" Version="$(AkkaHealthCheckVersion)" />
-    <PackageReference Include="Akka.Management" Version="1.0.0-beta2" />
+    <PackageReference Include="Akka.Management" Version="1.0.0" />
     <PackageReference Include="Petabridge.Cmd.Cluster" Version="$(PetabridgeCmdVersion)" />
   </ItemGroup>
 
