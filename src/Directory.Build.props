@@ -21,7 +21,7 @@ Migrated all Docker images and services to use .NET 5</PackageReleaseNotes>
     <AkkaHostingVersion>1.0.1</AkkaHostingVersion>
     <HoconVersion>2.0.3</HoconVersion>
     <AkkaHealthCheckVersion>1.0.0-beta1</AkkaHealthCheckVersion>
-    <PetabridgeCmdVersion>1.2.1</PetabridgeCmdVersion>
+    <PetabridgeCmdVersion>1.2.2</PetabridgeCmdVersion>
     <NetCoreVersion>net6.0</NetCoreVersion>
     <NetLibraryVersion>netstandard2.1</NetLibraryVersion>
     <MicrosoftExtensionsVersion>7.0.0</MicrosoftExtensionsVersion>
