@@ -12,7 +12,7 @@
 	<PackageVersion Include="Akka.Cluster.Hosting" Version="$(AkkaHostingVersion)" />
     <PackageVersion Include="Akka.Discovery.KubernetesApi" Version="1.0.1" />
     <PackageVersion Include="Akka.HealthCheck.Hosting" Version="$(AkkaHealthCheckVersion)" />
-    <PackageVersion Include="Akka.Management" Version="1.0.1" />
+    <PackageVersion Include="Akka.Management" Version="1.0.3" />
     <PackageVersion Include="Petabridge.Cmd.Cluster" Version="$(PetabridgeCmdVersion)" />
     <PackageVersion Include="HtmlAgilityPack" Version="1.11.46" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsVersion)" />
