@@ -8,9 +8,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Akka.Cluster" Version="$(AkkaVersion)" />
-    <PackageReference Include="Akka.DependencyInjection" Version="$(AkkaVersion)" />
-    <PackageReference Include="Akka.HealthCheck.Cluster" Version="$(AkkaHealthCheckVersion)" />
+    <PackageReference Include="Akka.Cluster" />
+    <PackageReference Include="Akka.DependencyInjection" />
+    <PackageReference Include="Akka.HealthCheck.Cluster" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WebCrawler.Shared.DevOps\WebCrawler.Shared.DevOps.csproj" />
