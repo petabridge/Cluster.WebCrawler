@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>$(NetLibraryVersion)</TargetFramework>
+    <TargetFrameworks>$(NetLibraryVersion);$(NetCoreVersion)</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Akka" Version="$(AkkaVersion)" />
+    <PackageReference Include="Akka" />
   </ItemGroup>
 
 </Project>

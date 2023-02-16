@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>$(NetLibraryVersion)</TargetFramework>
+    <TargetFrameworks>$(NetLibraryVersion);$(NetCoreVersion)</TargetFrameworks>
     <Description>Common DevOps configuration and instrumentation for WebCrawler.</Description>
   </PropertyGroup>
   <ItemGroup>
@@ -8,11 +8,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Akka.Cluster.Hosting" Version="$(AkkaHostingVersion)" />
-    <PackageReference Include="Akka.Discovery.KubernetesApi" Version="1.0.1" />
-    <PackageReference Include="Akka.HealthCheck.Hosting" Version="$(AkkaHealthCheckVersion)" />
-    <PackageReference Include="Akka.Management" Version="1.0.1" />
-    <PackageReference Include="Petabridge.Cmd.Cluster" Version="$(PetabridgeCmdVersion)" />
+    <PackageReference Include="Akka.Cluster.Hosting" />
+    <PackageReference Include="Akka.Discovery.KubernetesApi" />
+    <PackageReference Include="Akka.HealthCheck.Hosting" />
+    <PackageReference Include="Akka.Management" />
+    <PackageReference Include="Petabridge.Cmd.Cluster" />
   </ItemGroup>
 
   <ItemGroup>
