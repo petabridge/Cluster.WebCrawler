@@ -36,7 +36,9 @@ namespace WebCrawler.Shared.DevOps
             this AkkaConfigurationBuilder builder,
             RemoteOptions remoteOptions,
             Akka.Cluster.Hosting.ClusterOptions clusterOptions,
-            IConfiguration config)
+            IConfiguration config,
+            int readinessPort,
+            int pbmPort)
         {
             // Akka.Cluster split-brain resolver configurations
             clusterOptions.SplitBrainResolver = new KeepMajorityOption();
@@ -72,8 +74,8 @@ namespace WebCrawler.Shared.DevOps
             }
             else
             {
-                Console.WriteLine($"From environment: IP NULL, defaulting to: {Dns.GetHostName().ToHocon()}");
-                remoteOptions.PublicHostName = Dns.GetHostName().ToHocon();
+                Console.WriteLine("From environment: IP NULL, defaulting to: localhost");
+                remoteOptions.PublicHostName = "localhost";
             }
 
             if (options.Seeds is { })
@@ -87,10 +89,41 @@ namespace WebCrawler.Shared.DevOps
                 Console.WriteLine($"From environment: SEEDS: NULL, using seeds: [{string.Join(", ", clusterOptions.SeedNodes ?? new []{ "" })}]");
             }
 
+            if (options.ReadinessPort is { })
+            {
+                readinessPort = options.ReadinessPort.Value;
+                Console.WriteLine($"From environment: READINESSPORT: [{readinessPort}]");
+            }
+            else
+            {
+                Console.WriteLine($"From environment: READINESSPORT NULL, defaulting to: {readinessPort}");
+            }
+
+            if (options.PbmPort is { })
+            {
+                pbmPort = options.PbmPort.Value;
+                Console.WriteLine($"From environment: PBMPORT: [{pbmPort}]");
+            }
+            else
+            {
+                Console.WriteLine($"From environment: PBMPORT NULL, defaulting to: {pbmPort}");
+            }
+            
             #endregion
 
+            var cmdHocon = @$"
+# See petabridge.cmd configuration options here: https://cmd.petabridge.com/articles/install/host-configuration.html
+petabridge.cmd {{
+	# default IP address used to listen for incoming petabridge.cmd client connections
+	# should be a safe default as it listens on 'all network interfaces'.
+    host = ""0.0.0.0""
+
+    # default port number used to listen for incoming petabridge.cmd client connections
+    port = {pbmPort}
+}}";
+            
             builder
-                .AddHoconFile("shared.hocon", HoconAddMode.Prepend)
+                .AddHocon(cmdHocon, HoconAddMode.Prepend)
                 .AddHocon(config.GetSection("Akka"), HoconAddMode.Prepend)
                 .WithRemoting(remoteOptions)
                 .WithClustering(clusterOptions)
@@ -103,9 +136,8 @@ namespace WebCrawler.Shared.DevOps
                 // is usually an effective-enough tool for this.
                 .WithHealthCheck(opt =>
                 {
-                    // Use a second socket for TCP readiness checks from K8s
                     opt.Readiness.Transport = HealthCheckTransport.Tcp;
-                    opt.Readiness.TcpPort = 11001;
+                    opt.Readiness.TcpPort = readinessPort;
                 });
 
             // No need to setup seed based cluster

@@ -3,9 +3,6 @@
     <TargetFrameworks>$(NetLibraryVersion);$(NetCoreVersion)</TargetFrameworks>
     <Description>Common DevOps configuration and instrumentation for WebCrawler.</Description>
   </PropertyGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Config\crawler.DevOps.conf" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Akka.Cluster.Hosting" />
@@ -13,12 +10,6 @@
     <PackageReference Include="Akka.HealthCheck.Hosting" />
     <PackageReference Include="Akka.Management" />
     <PackageReference Include="Petabridge.Cmd.Cluster" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="shared.hocon">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>
