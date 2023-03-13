@@ -56,7 +56,9 @@ namespace WebCrawler.Web
                                     SeedNodes = new[] { "akka.tcp://webcrawler@localhost:16666" },
                                     Roles = new[] { "web" },
                                 }, 
-                                config: context.Configuration)
+                                config: context.Configuration, 
+                                readinessPort: 11003,
+                                pbmPort: 9112)
                             // Instantiate actors
                             .WithActors((system, registry) =>
                             {

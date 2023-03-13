@@ -14,4 +14,6 @@ public class ClusterOptions
     public string[]? Seeds { get; set; }
     public StartupMethod? StartupMethod { get; set; }
     public DiscoveryOptions? Discovery { get; set; }
+    public int? ReadinessPort { get; set; }
+    public int? PbmPort { get; set; }
 }

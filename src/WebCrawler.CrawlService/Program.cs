@@ -45,7 +45,9 @@ namespace WebCrawler.CrawlService
                                     SeedNodes = new [] { "akka.tcp://webcrawler@localhost:16666" },
                                     Roles = new [] { "crawler" }
                                 }, 
-                                config: hostContext.Configuration);
+                                config: hostContext.Configuration,
+                                readinessPort: 11001,
+                                pbmPort: 9110);
                     });
                 })
                 .ConfigureLogging((hostContext, configLogging) =>

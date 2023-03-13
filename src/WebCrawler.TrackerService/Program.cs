@@ -38,7 +38,6 @@ namespace WebCrawler.TrackerService
                         builder
                             .AddHoconFile("tracker.hocon", HoconAddMode.Prepend)
                             .AddHocon(hocon: "akka.remote.dot-netty.tcp.maximum-frame-size = 256000b", addMode: HoconAddMode.Prepend)
-                            .WithRemoting(hostname: "127.0.0.1", port: 5212)
                             // Add common DevOps settings
                             .WithOps(
                                 remoteOptions: new RemoteOptions
@@ -51,7 +50,9 @@ namespace WebCrawler.TrackerService
                                     SeedNodes = new[] { "akka.tcp://webcrawler@localhost:16666" },
                                     Roles = new[] { "tracker" }
                                 }, 
-                                config: hostContext.Configuration)
+                                config: hostContext.Configuration, 
+                                readinessPort: 11002,
+                                pbmPort: 9111)
                             // instantiate actors
                             .WithActors((system, registry) =>
                             {
