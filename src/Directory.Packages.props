@@ -10,7 +10,7 @@
     <PackageVersion Include="Akka.HealthCheck.Cluster" Version="$(AkkaHealthCheckVersion)" />
 	<PackageVersion Include="Akka.Streams" Version="$(AkkaVersion)" />
 	<PackageVersion Include="Akka.Cluster.Hosting" Version="$(AkkaHostingVersion)" />
-    <PackageVersion Include="Akka.Discovery.KubernetesApi" Version="1.0.3" />
+    <PackageVersion Include="Akka.Discovery.KubernetesApi" Version="1.5.0" />
     <PackageVersion Include="Akka.HealthCheck.Hosting" Version="$(AkkaHealthCheckVersion)" />
     <PackageVersion Include="Akka.Management" Version="1.0.3" />
     <PackageVersion Include="Petabridge.Cmd.Cluster" Version="$(PetabridgeCmdVersion)" />
