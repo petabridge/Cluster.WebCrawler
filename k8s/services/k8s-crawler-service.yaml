@@ -54,6 +54,12 @@ spec:
           value: "KubernetesDiscovery"
         - name: CLUSTER__DISCOVERY__SERVICENAME
           value: "webcrawler"
+        - name: CLUSTER__READINESSPORT
+          value: "11001"
+        - name: CLUSTER__PBMPORT
+          value: "9110"
+        - name: CLUSTER__ISDOCKER
+          value: "true"
         livenessProbe:
           tcpSocket:
             port: 11001
