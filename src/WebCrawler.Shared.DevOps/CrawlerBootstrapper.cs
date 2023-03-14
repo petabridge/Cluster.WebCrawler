@@ -72,9 +72,15 @@ namespace WebCrawler.Shared.DevOps
                 remoteOptions.PublicHostName = ip;
                 Console.WriteLine($"From environment: IP: {ip}");
             }
+            else if (options.IsDocker)
+            {
+                var host = Dns.GetHostName();
+                Console.WriteLine($"From environment: IP NULL, running in docker container, defaulting to: {host}");
+                remoteOptions.PublicHostName = host.ToHocon();
+            }
             else
             {
-                Console.WriteLine("From environment: IP NULL, defaulting to: localhost");
+                Console.WriteLine("From environment: IP NULL, not running in docker container, defaulting to: localhost");
                 remoteOptions.PublicHostName = "localhost";
             }
 

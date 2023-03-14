@@ -10,6 +10,9 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       CLUSTER__PORT: 4055
       CLUSTER__STARTUPMETHOD: "ConfigDiscovery"
+      CLUSTER__READINESSPORT: 11001
+      CLUSTER__PBMPORT: 9110
+      CLUSTER__ISDOCKER: "true"
       CLUSTER__DISCOVERY__SERVICENAME: "ConfigService"
       CLUSTER__DISCOVERY__CONFIGENDPOINTS__0: "webcrawler.crawlservice.1:8558"
       CLUSTER__DISCOVERY__CONFIGENDPOINTS__1: "webcrawler.crawlservice.2:8558"
@@ -26,6 +29,9 @@ services:
       CLUSTER__IP: "webcrawler.crawlservice.1"
       CLUSTER__PORT: 4055
       CLUSTER__STARTUPMETHOD: "ConfigDiscovery"
+      CLUSTER__READINESSPORT: 11001
+      CLUSTER__PBMPORT: 9110
+      CLUSTER__ISDOCKER: "true"
       CLUSTER__DISCOVERY__SERVICENAME: "ConfigService"
       CLUSTER__DISCOVERY__CONFIGENDPOINTS__0: "webcrawler.crawlservice.1:8558"
       CLUSTER__DISCOVERY__CONFIGENDPOINTS__1: "webcrawler.crawlservice.2:8558"
@@ -38,6 +44,9 @@ services:
       CLUSTER__IP: "webcrawler.crawlservice.2"
       CLUSTER__PORT: 4055
       CLUSTER__STARTUPMETHOD: "ConfigDiscovery"
+      CLUSTER__READINESSPORT: 11001
+      CLUSTER__PBMPORT: 9110
+      CLUSTER__ISDOCKER: "true"
       CLUSTER__DISCOVERY__SERVICENAME: "ConfigService"
       CLUSTER__DISCOVERY__CONFIGENDPOINTS__0: "webcrawler.crawlservice.1:8558"
       CLUSTER__DISCOVERY__CONFIGENDPOINTS__1: "webcrawler.crawlservice.2:8558"
@@ -50,6 +59,9 @@ services:
       CLUSTER__IP: "webcrawler.crawlservice.3"
       CLUSTER__PORT: 4055
       CLUSTER__STARTUPMETHOD: "ConfigDiscovery"
+      CLUSTER__READINESSPORT: 11001
+      CLUSTER__PBMPORT: 9110
+      CLUSTER__ISDOCKER: "true"
       CLUSTER__DISCOVERY__SERVICENAME: "ConfigService"
       CLUSTER__DISCOVERY__CONFIGENDPOINTS__0: "webcrawler.crawlservice.1:8558"
       CLUSTER__DISCOVERY__CONFIGENDPOINTS__1: "webcrawler.crawlservice.2:8558"
@@ -62,6 +74,9 @@ services:
     environment:
       CLUSTER__PORT: 4055
       CLUSTER__STARTUPMETHOD: "ConfigDiscovery"
+      CLUSTER__READINESSPORT: 11001
+      CLUSTER__PBMPORT: 9110
+      CLUSTER__ISDOCKER: "true"
       CLUSTER__DISCOVERY__SERVICENAME: "ConfigService"
       CLUSTER__DISCOVERY__CONFIGENDPOINTS__0: "webcrawler.crawlservice.1:8558"
       CLUSTER__DISCOVERY__CONFIGENDPOINTS__1: "webcrawler.crawlservice.2:8558"
