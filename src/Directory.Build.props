@@ -17,7 +17,7 @@ Migrated all Docker images and services to use .NET 5</PackageReleaseNotes>
   </PropertyGroup>
   <PropertyGroup>
     <XunitVersion>2.4.2</XunitVersion>
-    <AkkaVersion>1.4.49</AkkaVersion>
+    <AkkaVersion>1.5.2</AkkaVersion>
     <AkkaHostingVersion>1.0.3</AkkaHostingVersion>
     <HoconVersion>2.0.3</HoconVersion>
     <AkkaHealthCheckVersion>1.0.0</AkkaHealthCheckVersion>
