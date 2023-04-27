@@ -20,14 +20,14 @@ namespace WebCrawler.TrackerService.Actors.IO
     /// <summary>
     ///     Actor responsible for individual <see cref="CrawlJob" />
     /// </summary>
-    public class CrawlMaster : ReceiveActor, IWithUnboundedStash
+    public class CrawlMaster : ReceiveActor, IWithUnboundedStash, IWithTimers
     {
         public const string CoordinatorRouterName = "coordinators";
         protected readonly CrawlJob Job;
 
         protected IActorRef CoordinatorRouter;
         protected IActorRef DownloadTracker;
-        protected ICancelable JobStarter;
+        private const string StartJobKey = "startjob";
         protected ILoggingAdapter Log = Context.GetLogger();
 
         protected JobStatusUpdate RunningStatus;
@@ -107,9 +107,8 @@ namespace WebCrawler.TrackerService.Actors.IO
             Receive<IStartJobV1>(start =>
             {
                 Subscribers.Add(start.Requestor);
-
-                JobStarter = Context.System.Scheduler.ScheduleTellRepeatedlyCancelable(TimeSpan.FromMilliseconds(20),
-                    TimeSpan.FromMilliseconds(20), Self, new AttemptToStartJob(start), Self);
+                
+                Timers.StartPeriodicTimer(StartJobKey, new AttemptToStartJob(start), TimeSpan.FromMilliseconds(20), TimeSpan.FromMilliseconds(20));
             });
 
             Receive<AttemptToStartJob>(start =>
@@ -128,7 +127,7 @@ namespace WebCrawler.TrackerService.Actors.IO
                 //should kick off the initial downloads and parsing
                 //var routees = CoordinatorRouter.Ask<Routees>(new GetRoutees()).Result;
                 CoordinatorRouter.Tell(downloadRootDocument);
-                JobStarter.Cancel();
+                Timers.Cancel(StartJobKey);
 
                 Become(Started);
                 Stash.UnstashAll();
@@ -212,5 +211,7 @@ namespace WebCrawler.TrackerService.Actors.IO
         }
 
         #endregion
+
+        public ITimerScheduler Timers { get; set; }
     }
 }
