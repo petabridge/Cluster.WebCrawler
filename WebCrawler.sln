@@ -25,6 +25,31 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebCrawler.Shared.DevOps", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebCrawler.Shared.DevOps.Tests", "src\WebCrawler.Shared.DevOps.Tests\WebCrawler.Shared.DevOps.Tests.csproj", "{FED11EA4-D0F5-4B7D-9696-135E61ED3186}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{AF3DC386-7AEE-47AD-AE49-E5A4E35C1574}"
+	ProjectSection(SolutionItems) = preProject
+		src\Directory.Build.props = src\Directory.Build.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{4E722A10-7A86-4BAE-9769-4D3930A54AF3}"
+	ProjectSection(SolutionItems) = preProject
+		docker\docker-compose.yml = docker\docker-compose.yml
+		docker\docker-compose-config.yml = docker\docker-compose-config.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "k8s", "k8s", "{3BA13BDB-25EF-4C02-9DCF-F827DEC1E782}"
+	ProjectSection(SolutionItems) = preProject
+		k8s\services\k8s-crawler-service.yaml = k8s\services\k8s-crawler-service.yaml
+		k8s\services\k8s-local-web-loadbalancer.yaml = k8s\services\k8s-local-web-loadbalancer.yaml
+		k8s\services\k8s-tracker-service.yaml = k8s\services\k8s-tracker-service.yaml
+		k8s\services\k8s-web-service.yaml = k8s\services\k8s-web-service.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infrastructure", "infrastructure", "{B7FE9E00-64AD-4F4A-BFA8-1B3059D84367}"
+	ProjectSection(SolutionItems) = preProject
+		k8s\environment\configs\k8s-crd.yaml = k8s\environment\configs\k8s-crd.yaml
+		k8s\environment\configs\k8s-rbac.yaml = k8s\environment\configs\k8s-rbac.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,5 +90,10 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {31B5BCF5-43CA-472A-A27B-2E79702D69E8}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4E722A10-7A86-4BAE-9769-4D3930A54AF3} = {AF3DC386-7AEE-47AD-AE49-E5A4E35C1574}
+		{3BA13BDB-25EF-4C02-9DCF-F827DEC1E782} = {AF3DC386-7AEE-47AD-AE49-E5A4E35C1574}
+		{B7FE9E00-64AD-4F4A-BFA8-1B3059D84367} = {3BA13BDB-25EF-4C02-9DCF-F827DEC1E782}
 	EndGlobalSection
 EndGlobal

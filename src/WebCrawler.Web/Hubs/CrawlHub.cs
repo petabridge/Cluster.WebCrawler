@@ -5,6 +5,7 @@
 // -----------------------------------------------------------------------
 
 using Akka.Actor;
+using Akka.Hosting;
 using Microsoft.AspNetCore.SignalR;
 using WebCrawler.Web.Actors;
 
@@ -12,16 +13,16 @@ namespace WebCrawler.Web.Hubs
 {
     public class CrawlHub : Hub
     {
-        private readonly ISignalRProcessor _processor;
+        private readonly IActorRef _signalRActor;
 
-        public CrawlHub(ISignalRProcessor processor)
+        public CrawlHub(IRequiredActor<SignalRActor> actor)
         {
-            _processor = processor;
+            _signalRActor = actor.ActorRef;
         }
 
         public void StartCrawl(string message)
         {
-            _processor.Deliver(message);
+            _signalRActor.Tell(message);
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-  <Import Project="..\common.props" />
   <PropertyGroup>
     <TargetFramework>$(NetCoreVersion)</TargetFramework>
   </PropertyGroup>
@@ -9,11 +8,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Akka.Bootstrap.Docker" Version="$(AkkaBootstrapVersion)" />
-    <PackageReference Include="Akka.Cluster" Version="$(AkkaVersion)" />
-    <PackageReference Include="Akka.DependencyInjection" Version="$(AkkaVersion)" />
-    <PackageReference Include="Akka.HealthCheck.Cluster" Version="$(AkkaHealthCheckVersion)" />
-    <PackageReference Include="Microsoft.AspNet.SignalR" Version="2.4.3" />
+    <PackageReference Include="Akka.Cluster" />
+    <PackageReference Include="Akka.DependencyInjection" />
+    <PackageReference Include="Akka.HealthCheck.Cluster" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WebCrawler.Shared.DevOps\WebCrawler.Shared.DevOps.csproj" />

@@ -1,0 +1,87 @@
+version: '3'
+
+services:
+  webcrawler.web:
+    image: webcrawler.web:latest
+    ports:
+      - '9110:9110'
+      - '8080:80'
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      CLUSTER__PORT: 4055
+      CLUSTER__STARTUPMETHOD: "ConfigDiscovery"
+      CLUSTER__READINESSPORT: 11001
+      CLUSTER__PBMPORT: 9110
+      CLUSTER__ISDOCKER: "true"
+      CLUSTER__DISCOVERY__SERVICENAME: "ConfigService"
+      CLUSTER__DISCOVERY__CONFIGENDPOINTS__0: "webcrawler.crawlservice.1:8558"
+      CLUSTER__DISCOVERY__CONFIGENDPOINTS__1: "webcrawler.crawlservice.2:8558"
+      CLUSTER__DISCOVERY__CONFIGENDPOINTS__2: "webcrawler.crawlservice.3:8558"
+    depends_on:
+      - webcrawler.crawlservice.1
+      - webcrawler.crawlservice.2
+      - webcrawler.crawlservice.3
+
+  webcrawler.crawlservice.1:
+    image: webcrawler.crawlservice:latest
+    hostname: webcrawler.crawlservice.1
+    environment:
+      CLUSTER__IP: "webcrawler.crawlservice.1"
+      CLUSTER__PORT: 4055
+      CLUSTER__STARTUPMETHOD: "ConfigDiscovery"
+      CLUSTER__READINESSPORT: 11001
+      CLUSTER__PBMPORT: 9110
+      CLUSTER__ISDOCKER: "true"
+      CLUSTER__DISCOVERY__SERVICENAME: "ConfigService"
+      CLUSTER__DISCOVERY__CONFIGENDPOINTS__0: "webcrawler.crawlservice.1:8558"
+      CLUSTER__DISCOVERY__CONFIGENDPOINTS__1: "webcrawler.crawlservice.2:8558"
+      CLUSTER__DISCOVERY__CONFIGENDPOINTS__2: "webcrawler.crawlservice.3:8558"
+
+  webcrawler.crawlservice.2:
+    image: webcrawler.crawlservice:latest
+    hostname: webcrawler.crawlservice.2
+    environment:
+      CLUSTER__IP: "webcrawler.crawlservice.2"
+      CLUSTER__PORT: 4055
+      CLUSTER__STARTUPMETHOD: "ConfigDiscovery"
+      CLUSTER__READINESSPORT: 11001
+      CLUSTER__PBMPORT: 9110
+      CLUSTER__ISDOCKER: "true"
+      CLUSTER__DISCOVERY__SERVICENAME: "ConfigService"
+      CLUSTER__DISCOVERY__CONFIGENDPOINTS__0: "webcrawler.crawlservice.1:8558"
+      CLUSTER__DISCOVERY__CONFIGENDPOINTS__1: "webcrawler.crawlservice.2:8558"
+      CLUSTER__DISCOVERY__CONFIGENDPOINTS__2: "webcrawler.crawlservice.3:8558"
+
+  webcrawler.crawlservice.3:
+    image: webcrawler.crawlservice:latest
+    hostname: webcrawler.crawlservice.3
+    environment:
+      CLUSTER__IP: "webcrawler.crawlservice.3"
+      CLUSTER__PORT: 4055
+      CLUSTER__STARTUPMETHOD: "ConfigDiscovery"
+      CLUSTER__READINESSPORT: 11001
+      CLUSTER__PBMPORT: 9110
+      CLUSTER__ISDOCKER: "true"
+      CLUSTER__DISCOVERY__SERVICENAME: "ConfigService"
+      CLUSTER__DISCOVERY__CONFIGENDPOINTS__0: "webcrawler.crawlservice.1:8558"
+      CLUSTER__DISCOVERY__CONFIGENDPOINTS__1: "webcrawler.crawlservice.2:8558"
+      CLUSTER__DISCOVERY__CONFIGENDPOINTS__2: "webcrawler.crawlservice.3:8558"
+
+  webcrawler.trackerservice:
+    image: webcrawler.trackerservice:latest
+    deploy:
+      replicas: 3
+    environment:
+      CLUSTER__PORT: 4055
+      CLUSTER__STARTUPMETHOD: "ConfigDiscovery"
+      CLUSTER__READINESSPORT: 11001
+      CLUSTER__PBMPORT: 9110
+      CLUSTER__ISDOCKER: "true"
+      CLUSTER__DISCOVERY__SERVICENAME: "ConfigService"
+      CLUSTER__DISCOVERY__CONFIGENDPOINTS__0: "webcrawler.crawlservice.1:8558"
+      CLUSTER__DISCOVERY__CONFIGENDPOINTS__1: "webcrawler.crawlservice.2:8558"
+      CLUSTER__DISCOVERY__CONFIGENDPOINTS__2: "webcrawler.crawlservice.3:8558"
+    depends_on:
+      - webcrawler.crawlservice.1
+      - webcrawler.crawlservice.2
+      - webcrawler.crawlservice.3

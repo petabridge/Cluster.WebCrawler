@@ -7,7 +7,10 @@ metadata:
 spec:
   clusterIP: None
   ports:
-  - port: 5213
+    - port: 8558
+      name: management
+    - port: 5055
+      name: akka-remote
   selector:
     app: crawler
 ---
@@ -17,6 +20,7 @@ metadata:
   name: crawler
   labels:
     app: crawler
+    cluster: webcrawler
 spec:
   serviceName: crawler
   replicas: 3
@@ -27,6 +31,7 @@ spec:
     metadata:
       labels:
         app: crawler
+        cluster: webcrawler
     spec:
       terminationGracePeriodSeconds: 35
       containers:
@@ -41,13 +46,27 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        - name: CLUSTER_IP
+        - name: CLUSTER__IP
           value: "$(POD_NAME).crawler"
-        - name: CLUSTER_SEEDS
-          value: akka.tcp://webcrawler@lighthouse-0.lighthouse:4053,akka.tcp://webcrawler@lighthouse-1.lighthouse:4053,akka.tcp://webcrawler@lighthouse-2.lighthouse:4053
+        - name: CLUSTER__PORT
+          value: "5055"
+        - name: CLUSTER__STARTUPMETHOD
+          value: "KubernetesDiscovery"
+        - name: CLUSTER__DISCOVERY__SERVICENAME
+          value: "webcrawler"
+        - name: CLUSTER__READINESSPORT
+          value: "11001"
+        - name: CLUSTER__PBMPORT
+          value: "9110"
+        - name: CLUSTER__ISDOCKER
+          value: "true"
         livenessProbe:
           tcpSocket:
-            port: 5213
+            port: 11001
         ports:
-        - containerPort: 5213
-          protocol: TCP
+          - containerPort: 8558
+            protocol: TCP
+            name: management
+          - containerPort: 5055
+            protocol: TCP
+            name: akka-remote

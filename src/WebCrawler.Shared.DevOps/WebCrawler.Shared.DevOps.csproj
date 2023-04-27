@@ -1,19 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\common.props" />
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>$(NetLibraryVersion);$(NetCoreVersion)</TargetFrameworks>
     <Description>Common DevOps configuration and instrumentation for WebCrawler.</Description>
   </PropertyGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Config\crawler.DevOps.conf" />
-    <EmbeddedResource Include="Config\crawler.Phobos.conf" />
-  </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Petabridge.Cmd.Cluster" Version="$(PetabridgeCmdVersion)" />
-    <PackageReference Include="Akka.HealthCheck.Cluster" Version="$(AkkaHealthCheckVersion)" />
-    <PackageReference Include="Akka.Bootstrap.Docker" Version="$(AkkaBootstrapVersion)" />
-    <PackageReference Include="Akka.Bootstrap.Docker" Version="$(AkkaBootstrapVersion)"/>
+    <PackageReference Include="Akka.Cluster.Hosting" />
+    <PackageReference Include="Akka.Discovery.KubernetesApi" />
+    <PackageReference Include="Akka.HealthCheck.Hosting" />
+    <PackageReference Include="Akka.Management" />
+    <PackageReference Include="Petabridge.Cmd.Cluster" />
   </ItemGroup>
 
 </Project>

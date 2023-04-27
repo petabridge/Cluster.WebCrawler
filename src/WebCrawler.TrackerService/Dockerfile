@@ -1,20 +1,19 @@
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS base
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS base
 WORKDIR /app
 
 # should be a comma-delimited list
-ENV CLUSTER_SEEDS "[]"
-ENV CLUSTER_IP ""
-ENV CLUSTER_PORT "5212"
+ENV CLUSTER__IP ""
+ENV CLUSTER__PORT "5212"
 
 #Akka.Remote inbound listening endpoint
 EXPOSE 5212 
 
-COPY ./bin/Release/net5/publish/ /app
+COPY ./bin/Release/net6.0/publish/ /app
 
 # Install Petabridge.Cmd client
 RUN dotnet tool install --global pbm 
 
-FROM mcr.microsoft.com/dotnet/runtime:5.0 AS app
+FROM mcr.microsoft.com/dotnet/runtime:6.0 AS app
 WORKDIR /app
 
 COPY --from=base /app /app
