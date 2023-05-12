@@ -5,6 +5,7 @@ metadata:
   labels:
     app: web-cluster
 spec:
+  publishNotReadyAddresses: true
   clusterIP: None
   ports:
     - port: 8558
