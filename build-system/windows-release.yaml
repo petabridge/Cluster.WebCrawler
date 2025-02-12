@@ -1,24 +1,21 @@
-# Release task for PbLib projects
-# See https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema for reference
-
-pool:
-  vmImage: windows-latest
-  demands: Cmd
-
+# Release pipeline for NuGet packages and container images
 trigger:
   branches:
     include:
       - refs/tags/*
 
+pool:
+  vmImage: windows-latest
+
 variables:
-  - group: signingSecrets #create this group with SECRET variables `signingUsername` and `signingPassword`
-  - group: nugetKeys #create this group with SECRET variables `nugetKey`
+  - group: signingSecrets
+  - group: nugetKeys
   - name: githubConnectionName
-    value: yourConnection #replace this
+    value: yourConnection
   - name: projectName
-    value: yourProjectName #replace this
+    value: yourProjectName
   - name: githubRepositoryName
-    value: yourOrganization/yourRepo #replace this
+    value: yourOrganization/yourRepo
 
 steps:
 - task: UseDotNet@2
@@ -26,18 +23,74 @@ steps:
   inputs:
     useGlobalJson: true
 
-- task: BatchScript@1
-  displayName: 'FAKE Build'
+# Build solution
+- task: DotNetCoreCLI@2
+  displayName: 'Build solution'
   inputs:
-    filename: build.cmd
-    arguments: 'All SignClientUser=$(signingUsername) SignClientSecret=$(signingPassword) nugetpublishurl=https://www.nuget.org/api/v2/package nugetkey=$(nugetKey)'
+    command: build
+    projects: '**/*.sln'
+    arguments: '--configuration Release'
 
+# Run tests
+- task: DotNetCoreCLI@2
+  displayName: 'Run tests'
+  inputs:
+    command: test
+    projects: '**/*.sln'
+    arguments: '--configuration Release --no-build'
+    publishTestResults: true
+
+# Pack NuGet packages
+- task: DotNetCoreCLI@2
+  displayName: 'Pack NuGet packages'
+  inputs:
+    command: pack
+    packagesToPack: 'src/**/*.csproj;!**/*Tests.csproj'
+    configuration: Release
+    nobuild: true
+    includesymbols: true
+    versioningScheme: byEnvVar
+    versionEnvVar: Build.SourceBranchName
+
+# Push NuGet packages
+- task: NuGetCommand@2
+  displayName: 'Push NuGet packages'
+  inputs:
+    command: push
+    nuGetFeedType: external
+    publishFeedCredentials: 'NuGet'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+
+# Publish container images
+- task: DotNetCoreCLI@2
+  displayName: 'Publish Web container'
+  inputs:
+    command: publish
+    projects: 'src/WebCrawler.Web/WebCrawler.Web.csproj'
+    arguments: '--configuration Release --no-build /t:PublishContainer'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish Tracker container'
+  inputs:
+    command: publish
+    projects: 'src/WebCrawler.TrackerService/WebCrawler.TrackerService.csproj'
+    arguments: '--configuration Release --no-build /t:PublishContainer'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish Crawler container'
+  inputs:
+    command: publish
+    projects: 'src/WebCrawler.CrawlService/WebCrawler.CrawlService.csproj'
+    arguments: '--configuration Release --no-build /t:PublishContainer'
+
+# Create GitHub release
 - task: GitHubRelease@0
-  displayName: 'GitHub release (create)'
+  displayName: 'Create GitHub release'
   inputs:
     gitHubConnection: $(githubConnectionName)
     repositoryName: $(githubRepositoryName)
     title: '$(projectName) v$(Build.SourceBranchName)'
     releaseNotesFile: 'RELEASE_NOTES.md'
     assets: |
-     bin\nuget\*.nupkg
+     $(Build.ArtifactStagingDirectory)/**/*.nupkg
+     $(Build.ArtifactStagingDirectory)/**/*.snupkg
