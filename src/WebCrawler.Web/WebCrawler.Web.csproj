@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>$(NetCoreVersion)</TargetFramework>
     <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
-    <ContainerRepository>webcrawler</ContainerRepository>
+    <ContainerRepository>webcrawler.web</ContainerRepository>
     <ContainerTitle>web</ContainerTitle>
     <ContainerPort>80</ContainerPort>
     <ContainerPort>8558</ContainerPort>
