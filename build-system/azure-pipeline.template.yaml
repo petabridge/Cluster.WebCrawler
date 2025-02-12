@@ -65,20 +65,23 @@ jobs:
               # Start Docker Compose
               docker compose -f docker/docker-compose.yml up -d
 
-              # Wait for web service to be healthy (max 30 seconds)
+              # Wait for web service to be running (max 30 seconds)
               timeout=30
               elapsed=0
-              until [ "$(docker inspect --format='{{.State.Health.Status}}' $(docker ps -q -f name=webcrawler.web))" == "healthy" ] || [ $elapsed -ge $timeout ]; do
+              until [ "$(docker inspect --format='{{.State.Status}}' $(docker ps -q -f name=webcrawler.web))" == "running" ] || [ $elapsed -ge $timeout ]; do
                 sleep 1
                 elapsed=$((elapsed + 1))
               done
 
               if [ $elapsed -ge $timeout ]; then
-                echo "Timeout waiting for services to become healthy"
+                echo "Timeout waiting for services to start"
                 docker compose -f docker/docker-compose.yml logs
                 docker compose -f docker/docker-compose.yml down
                 exit 1
               fi
+
+              # Give the services a moment to initialize
+              sleep 10
 
               # Try pbm cluster show up to 5 times
               max_attempts=5
