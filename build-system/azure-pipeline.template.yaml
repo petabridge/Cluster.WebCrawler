@@ -46,18 +46,18 @@ jobs:
           inputs:
             command: publish
             projects: 'src/WebCrawler.Web/WebCrawler.Web.csproj'
-            arguments: '--configuration Release --no-build /t:PublishContainer'
+            arguments: '--configuration Release /t:PublishContainer'
         
         - task: DotNetCoreCLI@2
           displayName: 'Publish Tracker container'
           inputs:
             command: publish
             projects: 'src/WebCrawler.TrackerService/WebCrawler.TrackerService.csproj'
-            arguments: '--configuration Release --no-build /t:PublishContainer'
+            arguments: '--configuration Release /t:PublishContainer'
         
         - task: DotNetCoreCLI@2
           displayName: 'Publish Crawler container'
           inputs:
             command: publish
             projects: 'src/WebCrawler.CrawlService/WebCrawler.CrawlService.csproj'
-            arguments: '--configuration Release --no-build /t:PublishContainer'
+            arguments: '--configuration Release /t:PublishContainer'

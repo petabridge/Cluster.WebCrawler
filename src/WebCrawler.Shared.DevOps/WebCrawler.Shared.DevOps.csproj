@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>$(NetLibraryVersion);$(NetCoreVersion)</TargetFrameworks>
+    <TargetFramework>$(NetCoreVersion)</TargetFramework>
     <Description>Common DevOps configuration and instrumentation for WebCrawler.</Description>
   </PropertyGroup>
 
