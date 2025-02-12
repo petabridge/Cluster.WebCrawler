@@ -3,8 +3,8 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>$(NetCoreVersion)</TargetFramework>
     <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
-    <ContainerImageName>webcrawler-tracker</ContainerImageName>
-    <ContainerImageTags>latest;$(Version)</ContainerImageTags>
+    <ContainerRepository>webcrawler</ContainerRepository>
+    <ContainerTitle>tracker</ContainerTitle>
     <ContainerPort>4055</ContainerPort>
     <ContainerPort>11001</ContainerPort>
     <ContainerPort>9110</ContainerPort>

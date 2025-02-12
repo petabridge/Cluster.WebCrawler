@@ -15,11 +15,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebCrawler.Web", "src\WebCr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{FEFC4143-1464-45FE-9276-DCEBADA7E1C6}"
 	ProjectSection(SolutionItems) = preProject
-		build.cmd = build.cmd
-		build.fsx = build.fsx
-		build.ps1 = build.ps1
-		build.sh = build.sh
 		src\Directory.Build.props = src\Directory.Build.props
+		global.json = global.json
+		NuGet.Config = NuGet.Config
+		src\Directory.Packages.props = src\Directory.Packages.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebCrawler.Shared.DevOps", "src\WebCrawler.Shared.DevOps\WebCrawler.Shared.DevOps.csproj", "{B6DF5688-61D1-462B-9B29-37E0898E2A94}"

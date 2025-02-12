@@ -26,4 +26,21 @@ Migrated all Docker images and services to use .NET 9</PackageReleaseNotes>
     <NetLibraryVersion>netstandard2.1</NetLibraryVersion>
     <MicrosoftExtensionsVersion>9.0.0</MicrosoftExtensionsVersion>
   </PropertyGroup>
+
+  <PropertyGroup Label="ContainerSettings" Condition=" '$(CI)' == 'false' OR '$(CI)' == '' ">
+        <ContainerImageTags>$(VersionPrefix);latest</ContainerImageTags>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(CI)' == 'true' ">
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <ContainerImageTags>github-$(GITHUB_RUN_NUMBER);latest;$(VersionPrefix);</ContainerImageTags>
+        <ContainerVendor>$(GITHUB_REPOSITORY_OWNER)</ContainerVendor>
+        <ContainerVersion>$(GITHUB_SHA)</ContainerVersion>
+    </PropertyGroup>
+
+    <ItemGroup Condition=" '$(CI)' == 'true' ">
+        <ContainerLabel Include="com.docker.extension.changelog" Value="$(GITHUB_SERVER_URL)/$(GITHUB_REPOSITORY)/commit/$(GITHUB_SHA)" />
+        <ContainerLabel Include="com.docker.extension.publisher-url" Value="$(GITHUB_SERVER_URL)/$(GITHUB_REPOSITORY_OWNER)" />
+    </ItemGroup>
 </Project>
