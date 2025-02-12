@@ -2,7 +2,7 @@ version: '3'
 
 services:
   webcrawler.web:
-    image: webcrawler.web:latest
+    image: webcrawler/web:latest
     hostname: webcrawler.web
     ports:
       - '9110:9110'
@@ -18,9 +18,15 @@ services:
       CLUSTER__READINESSPORT: 11001
       CLUSTER__PBMPORT: 9110
       CLUSTER__ISDOCKER: "true"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11001/"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
 
   webcrawler.crawlservice:
-    image: webcrawler.crawlservice:latest
+    image: webcrawler/crawler:latest
     deploy:
       replicas: 3
     environment:
@@ -31,10 +37,11 @@ services:
       CLUSTER__PBMPORT: 9110
       CLUSTER__ISDOCKER: "true"
     depends_on:
-      - "webcrawler.web"
+      webcrawler.web:
+        condition: service_healthy
 
   webcrawler.trackerservice:
-    image: webcrawler.trackerservice:latest
+    image: webcrawler/tracker:latest
     deploy:
       replicas: 3
     environment:
@@ -45,4 +52,5 @@ services:
       CLUSTER__PBMPORT: 9110
       CLUSTER__ISDOCKER: "true"
     depends_on:
-      - "webcrawler.web"
+      webcrawler.web:
+        condition: service_healthy
