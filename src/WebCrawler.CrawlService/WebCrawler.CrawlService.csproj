@@ -3,7 +3,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>$(NetCoreVersion)</TargetFramework>
     <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
-    <ContainerRepository>webcrawler</ContainerRepository>
+    <ContainerRepository>webcrawler.crawlservice</ContainerRepository>
     <ContainerTitle>crawler</ContainerTitle>
     <ContainerPort>5213</ContainerPort>
     <ContainerPort>11001</ContainerPort>

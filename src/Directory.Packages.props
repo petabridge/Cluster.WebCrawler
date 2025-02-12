@@ -5,11 +5,12 @@
   <!-- App dependencies -->
   <ItemGroup>
     <PackageVersion Include="Akka" Version="$(AkkaVersion)" />
-	<PackageVersion Include="Akka.Cluster" Version="$(AkkaVersion)" />
+    <PackageVersion Include="Akka.Cluster" Version="$(AkkaVersion)" />
     <PackageVersion Include="Akka.DependencyInjection" Version="$(AkkaVersion)" />
     <PackageVersion Include="Akka.HealthCheck.Cluster" Version="$(AkkaHealthCheckVersion)" />
-	<PackageVersion Include="Akka.Streams" Version="$(AkkaVersion)" />
-	<PackageVersion Include="Akka.Cluster.Hosting" Version="$(AkkaHostingVersion)" />
+    <PackageVersion Include="Akka.HealthCheck.Hosting.Web" Version="1.5.37" />
+    <PackageVersion Include="Akka.Streams" Version="$(AkkaVersion)" />
+    <PackageVersion Include="Akka.Cluster.Hosting" Version="$(AkkaHostingVersion)" />
     <PackageVersion Include="Akka.Discovery.KubernetesApi" Version="1.5.7" />
     <PackageVersion Include="Akka.HealthCheck.Hosting" Version="$(AkkaHealthCheckVersion)" />
     <PackageVersion Include="Akka.Management" Version="1.5.7" />
@@ -20,17 +21,16 @@
     <PackageVersion Include="Microsoft.Extensions.Logging.Configuration" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftExtensionsVersion)" />
   </ItemGroup>
-  <!-- Test dependencies -->  
+  <!-- Test dependencies -->
   <ItemGroup>
-	<PackageVersion Include="FluentAssertions" Version="6.12.0" />
+    <PackageVersion Include="FluentAssertions" Version="6.12.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageVersion Include="xunit" Version="$(XunitVersion)" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.0" />
     <PackageVersion Include="Akka.TestKit.Xunit2" Version="$(AkkaVersion)" />
   </ItemGroup>
-	<!-- SourceLink support for all Akka.NET projects -->
-	<ItemGroup>
-		<PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
-	</ItemGroup>
-	
+  <!-- SourceLink support for all Akka.NET projects -->
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
+  </ItemGroup>
 </Project>

@@ -41,23 +41,68 @@ jobs:
       
       # Publish containers if specified
       - ${{ if eq(parameters.publishContainers, true) }}:
-        - task: DotNetCoreCLI@2
-          displayName: 'Publish Web container'
+        - task: Bash@3
+          displayName: 'Validate Docker Compose deployment'
           inputs:
-            command: publish
-            projects: 'src/WebCrawler.Web/WebCrawler.Web.csproj'
-            arguments: '--configuration Release /t:PublishContainer'
-        
+            targetType: 'inline'
+            script:
+              dotnet publish --configuration Release /t:PublishContainer
+
+        # Install Petabridge.Cmd tool
         - task: DotNetCoreCLI@2
-          displayName: 'Publish Tracker container'
+          displayName: 'Install Petabridge.Cmd tool'
           inputs:
-            command: publish
-            projects: 'src/WebCrawler.TrackerService/WebCrawler.TrackerService.csproj'
-            arguments: '--configuration Release /t:PublishContainer'
-        
-        - task: DotNetCoreCLI@2
-          displayName: 'Publish Crawler container'
+            command: custom
+            custom: tool
+            arguments: 'install --global pbm'
+
+        # Start Docker Compose and validate cluster
+        - task: Bash@3
+          displayName: 'Validate Docker Compose deployment'
           inputs:
-            command: publish
-            projects: 'src/WebCrawler.CrawlService/WebCrawler.CrawlService.csproj'
-            arguments: '--configuration Release /t:PublishContainer'
+            targetType: 'inline'
+            script: |
+              # Start Docker Compose
+              docker compose -f docker/docker-compose.yml up -d
+
+              # Wait for web service to be running (max 30 seconds)
+              timeout=30
+              elapsed=0
+              until [ "$(docker inspect --format='{{.State.Status}}' $(docker ps -q -f name=webcrawler.web))" == "running" ] || [ $elapsed -ge $timeout ]; do
+                sleep 1
+                elapsed=$((elapsed + 1))
+              done
+
+              if [ $elapsed -ge $timeout ]; then
+                echo "Timeout waiting for services to start"
+                docker compose -f docker/docker-compose.yml logs
+                docker compose -f docker/docker-compose.yml down
+                exit 1
+              fi
+
+              # Give the services a moment to initialize
+              sleep 10
+
+              # Try pbm cluster show up to 5 times
+              max_attempts=5
+              attempt=1
+              success=false
+
+              while [ $attempt -le $max_attempts ] && [ "$success" = false ]; do
+                echo "Attempt $attempt of $max_attempts to verify cluster status..."
+                if pbm 127.0.0.1:9110 cluster show; then
+                  success=true
+                else
+                  sleep 5
+                  attempt=$((attempt + 1))
+                fi
+              done
+
+              # Clean up containers
+              docker compose -f docker/docker-compose.yml down
+
+              # Exit with failure if pbm checks didn't succeed
+              if [ "$success" = false ]; then
+                echo "Failed to verify cluster status after $max_attempts attempts"
+                exit 1
+              fi

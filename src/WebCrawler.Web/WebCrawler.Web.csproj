@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>$(NetCoreVersion)</TargetFramework>
     <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
-    <ContainerRepository>webcrawler</ContainerRepository>
+    <ContainerRepository>webcrawler.web</ContainerRepository>
     <ContainerTitle>web</ContainerTitle>
     <ContainerPort>80</ContainerPort>
     <ContainerPort>8558</ContainerPort>
@@ -19,6 +19,7 @@
     <PackageReference Include="Akka.Cluster" />
     <PackageReference Include="Akka.DependencyInjection" />
     <PackageReference Include="Akka.HealthCheck.Cluster" />
+    <PackageReference Include="Akka.HealthCheck.Hosting.Web" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WebCrawler.Shared.DevOps\WebCrawler.Shared.DevOps.csproj" />

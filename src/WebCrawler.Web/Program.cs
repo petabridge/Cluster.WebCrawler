@@ -4,6 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using System;
 using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.Cluster.Hosting;
@@ -20,6 +21,9 @@ using Microsoft.Extensions.Hosting;
 using WebCrawler.Shared.DevOps;
 using WebCrawler.Web.Actors;
 using WebCrawler.Web.Hubs;
+using Akka.HealthCheck.Hosting;
+using Akka.HealthCheck.Hosting.Web;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 namespace WebCrawler.Web
 {
@@ -37,6 +41,10 @@ namespace WebCrawler.Web
                     services.AddControllersWithViews();
                     services.AddSignalR();
                     services.AddSingleton<CrawlHubHelper, CrawlHubHelper>();
+
+                    // Add health checks
+                    services.AddHealthChecks();
+                    services.WithAkkaHealthCheck(HealthCheckType.Cluster);
 
                     // Add Akka hosted service
                     services.AddAkka("webcrawler", (builder, provider) =>
@@ -59,6 +67,12 @@ namespace WebCrawler.Web
                                 config: context.Configuration, 
                                 readinessPort: 11003,
                                 pbmPort: 9112)
+                            // Add Akka.HealthCheck
+                            .WithHealthCheck(options =>
+                            {
+                                options.AddProviders(HealthCheckType.Cluster); // Adds cluster membership health check
+                                options.AddProviders(HealthCheckType.Default);
+                            })
                             // Instantiate actors
                             .WithActors((system, registry) =>
                             {
@@ -87,6 +101,9 @@ namespace WebCrawler.Web
                     ep.MapControllerRoute("default",
                         "{controller=Home}/{action=Index}/{id?}");
                     ep.MapHub<CrawlHub>("/hubs/crawlHub");
+                    
+                    // Map health check endpoints
+                    ep.MapAkkaHealthCheckRoutes();
                 });
 
             await app.RunAsync();
