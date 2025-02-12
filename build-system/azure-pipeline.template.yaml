@@ -2,8 +2,7 @@ parameters:
   name: ''
   displayName: ''
   vmImage: ''
-  scriptFileName: ''
-  scriptArgs: 'all'
+  publishContainers: false
   timeoutInMinutes: 120
 
 jobs:
@@ -13,37 +12,52 @@ jobs:
     pool:
       vmImage: ${{ parameters.vmImage }}
     steps:
-      - checkout: self  # self represents the repo where the initial Pipelines YAML file was found
-        clean: false  # whether to fetch clean each time
-        submodules: recursive  # set to 'true' for a single level of submodules or 'recursive' to get submodules of submodules
+      - checkout: self
+        clean: false
+        submodules: recursive
         persistCredentials: true
+      
       - task: UseDotNet@2
-        displayName: 'Use .NET 6'
+        displayName: 'Install .NET SDK from global.json'
         inputs:
-          version: '6.x'
-      # Linux or macOS
-      - task: Bash@3 
-        displayName: Linux / OSX Build
+          useGlobalJson: true
+      
+      # Build solution
+      - task: DotNetCoreCLI@2
+        displayName: 'Build solution'
         inputs:
-          filePath: ${{ parameters.scriptFileName }}
-          arguments: ${{ parameters.scriptArgs }}
-        continueOnError: true
-        condition: in( variables['Agent.OS'], 'Linux', 'Darwin' )
-      # Windows
-      - task: BatchScript@1
-        displayName: Windows Build
+          command: build
+          projects: '**/*.sln'
+          arguments: '--configuration Release'
+      
+      # Run tests
+      - task: DotNetCoreCLI@2
+        displayName: 'Run tests'
         inputs:
-          filename: ${{ parameters.scriptFileName }}
-          arguments: ${{ parameters.scriptArgs }}
-        continueOnError: true
-        condition: eq( variables['Agent.OS'], 'Windows_NT' )
-      - task: PublishTestResults@2
-        inputs:
-          testRunner: VSTest
-          testResultsFiles: '**/*.trx' #TestResults folder usually
-          testRunTitle: ${{ parameters.name }}
-          mergeTestResults: true
-      - script: 'echo 1>&2'
-        failOnStderr: true
-        displayName: 'If above is partially succeeded, then fail'
-        condition: eq(variables['Agent.JobStatus'], 'SucceededWithIssues')
+          command: test
+          projects: '**/*.sln'
+          arguments: '--configuration Release --no-build --collect:"XPlat Code Coverage"'
+          publishTestResults: true
+      
+      # Publish containers if specified
+      - ${{ if eq(parameters.publishContainers, true) }}:
+        - task: DotNetCoreCLI@2
+          displayName: 'Publish Web container'
+          inputs:
+            command: publish
+            projects: 'src/WebCrawler.Web/WebCrawler.Web.csproj'
+            arguments: '--configuration Release --no-build /t:PublishContainer'
+        
+        - task: DotNetCoreCLI@2
+          displayName: 'Publish Tracker container'
+          inputs:
+            command: publish
+            projects: 'src/WebCrawler.TrackerService/WebCrawler.TrackerService.csproj'
+            arguments: '--configuration Release --no-build /t:PublishContainer'
+        
+        - task: DotNetCoreCLI@2
+          displayName: 'Publish Crawler container'
+          inputs:
+            command: publish
+            projects: 'src/WebCrawler.CrawlService/WebCrawler.CrawlService.csproj'
+            arguments: '--configuration Release --no-build /t:PublishContainer'

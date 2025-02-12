@@ -19,19 +19,16 @@ jobs:
       name: 'windows_pr'
       displayName: 'Windows PR Validation'
       vmImage: 'windows-latest'
-      scriptFileName: build.cmd
-      scriptArgs: all
+      publishContainers: false
   - template: azure-pipeline.template.yaml
     parameters:
       name: 'linux_pr'
       displayName: 'Linux PR Validation'
-      vmImage: 'ubuntu-20.04'
-      scriptFileName: ./build.sh
-      scriptArgs: all
+      vmImage: 'ubuntu-latest'
+      publishContainers: false
   - template: azure-pipeline.template.yaml
     parameters:
       name: 'docker_build'
       displayName: 'Docker Build'
-      vmImage: 'ubuntu-20.04'
-      scriptFileName: ./build.sh
-      scriptArgs: Docker
+      vmImage: 'ubuntu-latest'
+      publishContainers: true

@@ -1,10 +1,10 @@
 <Project>
   <PropertyGroup>
-    <Copyright>Copyright © 2015-2023 Petabridge, LLC</Copyright>
+    <Copyright>Copyright © 2015-2024 Petabridge, LLC</Copyright>
     <Authors>Petabridge</Authors>
     <VersionPrefix>0.3.0</VersionPrefix>
     <PackageReleaseNotes>Moved all services to use modern `IHostedService` implementation
-Migrated all Docker images and services to use .NET 5</PackageReleaseNotes>
+Migrated all Docker images and services to use .NET 9</PackageReleaseNotes>
     <PackageIconUrl>
     </PackageIconUrl>
     <PackageProjectUrl>
@@ -13,7 +13,7 @@ Migrated all Docker images and services to use .NET 5</PackageReleaseNotes>
     </PackageLicenseUrl>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <Nullable>enable</Nullable>
-    <LangVersion>10</LangVersion>
+    <LangVersion>12</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <XunitVersion>2.5.1</XunitVersion>
@@ -22,8 +22,8 @@ Migrated all Docker images and services to use .NET 5</PackageReleaseNotes>
     <HoconVersion>2.0.4</HoconVersion>
     <AkkaHealthCheckVersion>1.5.12</AkkaHealthCheckVersion>
     <PetabridgeCmdVersion>1.3.2</PetabridgeCmdVersion>
-    <NetCoreVersion>net6.0</NetCoreVersion>
+    <NetCoreVersion>net9.0</NetCoreVersion>
     <NetLibraryVersion>netstandard2.1</NetLibraryVersion>
-    <MicrosoftExtensionsVersion>8.0.0</MicrosoftExtensionsVersion>
+    <MicrosoftExtensionsVersion>9.0.0</MicrosoftExtensionsVersion>
   </PropertyGroup>
 </Project>
