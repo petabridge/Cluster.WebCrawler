@@ -10,6 +10,7 @@
     <PackageReference Include="Akka.HealthCheck.Hosting" />
     <PackageReference Include="Akka.Management" />
     <PackageReference Include="Petabridge.Cmd.Cluster" />
+    <PackageReference Include="Microsoft.Extensions.Hosting"/>
   </ItemGroup>
 
 </Project>
