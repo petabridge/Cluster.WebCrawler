@@ -19,14 +19,14 @@ services:
       CLUSTER__PBMPORT: 9110
       CLUSTER__ISDOCKER: "true"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/healthz/akka"]
+      test: ["CMD", "curl", "-f", "http://localhost:80/healthz/akka/live"]
       interval: 5s
       timeout: 3s
       retries: 3
       start_period: 10s
 
   webcrawler.crawlservice:
-    image: webcrawler.crawler:latest
+    image: webcrawler.crawlservice:latest
     deploy:
       replicas: 3
     environment:
@@ -41,7 +41,7 @@ services:
         condition: service_healthy
 
   webcrawler.trackerservice:
-    image: webcrawler.tracker:latest
+    image: webcrawler.trackerservice:latest
     deploy:
       replicas: 3
     environment:
