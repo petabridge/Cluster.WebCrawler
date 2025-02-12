@@ -18,12 +18,6 @@ services:
       CLUSTER__READINESSPORT: 11001
       CLUSTER__PBMPORT: 9110
       CLUSTER__ISDOCKER: "true"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/healthz/akka/live"]
-      interval: 5s
-      timeout: 3s
-      retries: 3
-      start_period: 10s
 
   webcrawler.crawlservice:
     image: webcrawler.crawlservice:latest
@@ -37,8 +31,7 @@ services:
       CLUSTER__PBMPORT: 9110
       CLUSTER__ISDOCKER: "true"
     depends_on:
-      webcrawler.web:
-        condition: service_healthy
+      - "webcrawler.web"
 
   webcrawler.trackerservice:
     image: webcrawler.trackerservice:latest
@@ -52,5 +45,4 @@ services:
       CLUSTER__PBMPORT: 9110
       CLUSTER__ISDOCKER: "true"
     depends_on:
-      webcrawler.web:
-        condition: service_healthy
+      - "webcrawler.web"
