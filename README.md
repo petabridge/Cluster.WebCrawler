@@ -27,16 +27,56 @@ The containers will be tagged with both `latest` and the current version number.
 
 ### Running The Seed Node Demo
 
-Use `docker-compose` to run the seed-node based discovery demo:
+First, build the containers locally:
 
-```powershell
-PS> docker-compose -f ./docker/docker-compose.yml up
+```bash
+# Build all containers
+dotnet publish WebCrawler.sln --configuration Release /t:PublishContainer
 ```
 
-From there, you can use [Petabridge.Cmd](https://cmd.petabridge.com/) to connect to Lighthouse to view the status of the cluster:
+Then use `docker-compose` to run the seed-node based discovery demo:
 
-```powershell
-PS> pbm 127.0.0.1:9110 cluster show
+```bash
+# Start the cluster
+docker compose -f ./docker/docker-compose.yml up -d
+
+# View the logs
+docker compose -f ./docker/docker-compose.yml logs -f
+```
+
+The web interface will be available at `http://localhost:8080`.
+
+From there, you can use [Petabridge.Cmd](https://cmd.petabridge.com/) to connect to the cluster and view its status:
+
+```bash
+pbm 127.0.0.1:9110 cluster show
+```
+
+To stop the cluster:
+
+```bash
+docker compose -f ./docker/docker-compose.yml down
+```
+
+### Scaling the Solution
+
+The WebCrawler solution supports dynamic scaling of both the crawler and tracker services. You can scale these services up or down while the cluster is running:
+
+```bash
+# Scale up the crawler service to 5 instances
+docker compose -f ./docker/docker-compose.yml up -d --scale webcrawler.crawlservice=5
+
+# Scale up the tracker service to 4 instances
+docker compose -f ./docker/docker-compose.yml up -d --scale webcrawler.trackerservice=4
+
+# Scale down both services
+docker compose -f ./docker/docker-compose.yml up -d --scale webcrawler.crawlservice=2 --scale webcrawler.trackerservice=2
+```
+
+You can monitor the cluster's health and member status using Petabridge.Cmd after scaling:
+
+```bash
+pbm 127.0.0.1:9110 cluster show
 ```
 
 ### Running The Config Discovery Demo
