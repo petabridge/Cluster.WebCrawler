@@ -2,8 +2,8 @@
   <PropertyGroup>
     <TargetFramework>$(NetCoreVersion)</TargetFramework>
     <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
-    <ContainerImageName>webcrawler-web</ContainerImageName>
-    <ContainerImageTags>latest;$(Version)</ContainerImageTags>
+    <ContainerRepository>webcrawler</ContainerRepository>
+    <ContainerTitle>web</ContainerTitle>
     <ContainerPort>80</ContainerPort>
     <ContainerPort>8558</ContainerPort>
     <ContainerPort>5055</ContainerPort>

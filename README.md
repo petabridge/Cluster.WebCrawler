@@ -1,20 +1,29 @@
 # Cluster.WebCrawler
 K8s, DevOps-ified version of the Akka.Cluster WebCrawler code sample.
 
-## How To Run This Sample
-First, we need to build the Docker images:
+## Building and Publishing Docker Containers
+This solution uses .NET's built-in container support. The following container images are available:
 
-### Windows
+- `webcrawler/web`: The web frontend service (ASP.NET Core)
+- `webcrawler/tracker`: The tracker service (console application)
+- `webcrawler/crawler`: The crawler service (console application)
 
-```powershell
-PS> ./build.cmd Docker
+When built in CI, the images will include additional metadata and tags based on the GitHub environment.
+
+### Building Containers Locally
+To build the containers locally, run:
+
+```bash
+# Build all containers
+dotnet publish WebCrawler.sln --configuration Release /t:PublishContainer
+
+# Or build individual containers
+dotnet publish src/WebCrawler.Web/WebCrawler.Web.csproj --configuration Release /t:PublishContainer
+dotnet publish src/WebCrawler.TrackerService/WebCrawler.TrackerService.csproj --configuration Release /t:PublishContainer
+dotnet publish src/WebCrawler.CrawlService/WebCrawler.CrawlService.csproj --configuration Release /t:PublishContainer
 ```
 
-### Linux or OS X
-
-```powershell
-PS> ./build.sh Docker
-```
+The containers will be tagged with both `latest` and the current version number. In CI environments, additional tags will include the GitHub run number and commit SHA.
 
 ### Running The Seed Node Demo
 
