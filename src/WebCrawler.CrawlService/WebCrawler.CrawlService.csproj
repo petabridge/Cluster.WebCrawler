@@ -2,6 +2,12 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>$(NetCoreVersion)</TargetFramework>
+    <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
+    <ContainerImageName>webcrawler-crawler</ContainerImageName>
+    <ContainerImageTags>latest;$(Version)</ContainerImageTags>
+    <ContainerPort>5213</ContainerPort>
+    <ContainerPort>11001</ContainerPort>
+    <ContainerPort>9110</ContainerPort>
   </PropertyGroup>
 
   <ItemGroup>

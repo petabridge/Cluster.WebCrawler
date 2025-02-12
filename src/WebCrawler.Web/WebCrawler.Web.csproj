@@ -1,6 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>$(NetCoreVersion)</TargetFramework>
+    <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
+    <ContainerImageName>webcrawler-web</ContainerImageName>
+    <ContainerImageTags>latest;$(Version)</ContainerImageTags>
+    <ContainerPort>80</ContainerPort>
+    <ContainerPort>8558</ContainerPort>
+    <ContainerPort>5055</ContainerPort>
+    <ContainerPort>11001</ContainerPort>
+    <ContainerPort>9110</ContainerPort>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="web.hocon">
