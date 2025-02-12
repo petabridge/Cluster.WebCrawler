@@ -26,3 +26,9 @@ jobs:
       displayName: 'Linux PR Validation'
       vmImage: 'ubuntu-latest'
       publishContainers: false
+  - template: azure-pipeline.template.yaml
+    parameters:
+      name: 'docker_build'
+      displayName: 'Docker Build'
+      vmImage: 'ubuntu-latest'
+      publishContainers: true
