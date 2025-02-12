@@ -41,26 +41,12 @@ jobs:
       
       # Publish containers if specified
       - ${{ if eq(parameters.publishContainers, true) }}:
-        - task: DotNetCoreCLI@2
-          displayName: 'Publish Web container'
+        - task: Bash@3
+          displayName: 'Validate Docker Compose deployment'
           inputs:
-            command: publish
-            projects: 'src/WebCrawler.Web/WebCrawler.Web.csproj'
-            arguments: '--configuration Release /t:PublishContainer'
-        
-        - task: DotNetCoreCLI@2
-          displayName: 'Publish Tracker container'
-          inputs:
-            command: publish
-            projects: 'src/WebCrawler.TrackerService/WebCrawler.TrackerService.csproj'
-            arguments: '--configuration Release /t:PublishContainer'
-        
-        - task: DotNetCoreCLI@2
-          displayName: 'Publish Crawler container'
-          inputs:
-            command: publish
-            projects: 'src/WebCrawler.CrawlService/WebCrawler.CrawlService.csproj'
-            arguments: '--configuration Release /t:PublishContainer'
+            targetType: 'inline'
+            script:
+              dotnet publish --configuration Release /t:PublishContainer
 
         # Install Petabridge.Cmd tool
         - task: DotNetCoreCLI@2
