@@ -19,6 +19,7 @@
     <PackageReference Include="Akka.Cluster" />
     <PackageReference Include="Akka.DependencyInjection" />
     <PackageReference Include="Akka.HealthCheck.Cluster" />
+    <PackageReference Include="Akka.HealthCheck.Hosting.Web" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WebCrawler.Shared.DevOps\WebCrawler.Shared.DevOps.csproj" />

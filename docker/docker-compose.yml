@@ -19,7 +19,7 @@ services:
       CLUSTER__PBMPORT: 9110
       CLUSTER__ISDOCKER: "true"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11001/"]
+      test: ["CMD", "curl", "-f", "http://localhost:80/healthz/akka"]
       interval: 5s
       timeout: 3s
       retries: 3
