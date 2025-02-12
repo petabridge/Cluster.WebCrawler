@@ -2,7 +2,7 @@
 # See https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema for reference
 
 pool:
-  vmImage: vs2017-win2016
+  vmImage: windows-latest
   demands: Cmd
 
 trigger:
@@ -21,6 +21,11 @@ variables:
     value: yourOrganization/yourRepo #replace this
 
 steps:
+- task: UseDotNet@2
+  displayName: 'Install .NET SDK from global.json'
+  inputs:
+    useGlobalJson: true
+
 - task: BatchScript@1
   displayName: 'FAKE Build'
   inputs:
