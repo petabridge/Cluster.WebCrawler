@@ -19,13 +19,13 @@ namespace WebCrawler.TrackerService.State
     {
         public bool IsComplete { get; private set; }
 
-        public Deadline Timeout { get; private set; }
+        public Deadline? Timeout { get; private set; }
 
         public bool CanProcess => !IsComplete && (Timeout == null || Timeout.IsOverdue);
 
-        public IActorRef Owner { get; private set; }
+        public IActorRef? Owner { get; private set; }
 
-        public static CrawlStatus StartCrawl(IActorRef owner, TimeSpan crawlTime)
+        public static CrawlStatus StartCrawl(IActorRef? owner, TimeSpan crawlTime)
         {
             var crawl = new CrawlStatus();
             crawl.TryClaim(owner, crawlTime);
@@ -40,7 +40,7 @@ namespace WebCrawler.TrackerService.State
             return this;
         }
 
-        public bool TryClaim(IActorRef newOwner, TimeSpan crawlTime)
+        public bool TryClaim(IActorRef? newOwner, TimeSpan crawlTime)
         {
             if (CanProcess)
             {

@@ -26,7 +26,7 @@ namespace WebCrawler.Shared.Commands.V1
         }
 
         [JsonConstructor] // need this to tell JSON.NET which constructor to pick
-        public JobStatusUpdate(CrawlJob job, CrawlJobStats stats, JobStatus status, DateTime startTime,
+        public JobStatusUpdate(CrawlJob job, CrawlJobStats? stats, JobStatus status, DateTime startTime,
             DateTime? endTime)
         {
             Job = job;
@@ -38,7 +38,7 @@ namespace WebCrawler.Shared.Commands.V1
 
         public CrawlJob Job { get; }
 
-        public CrawlJobStats Stats { get; }
+        public CrawlJobStats? Stats { get; }
 
         public DateTime StartTime { get; }
 

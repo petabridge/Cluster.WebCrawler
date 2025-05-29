@@ -25,8 +25,8 @@ namespace WebCrawler.TrackerService.Actors.IO
         public const string CoordinatorRouterName = "coordinators";
         protected readonly CrawlJob Job;
 
-        protected IActorRef CoordinatorRouter;
-        protected IActorRef DownloadTracker;
+        protected IActorRef? CoordinatorRouter;
+        protected IActorRef? DownloadTracker;
         private const string StartJobKey = "startjob";
         protected ILoggingAdapter Log = Context.GetLogger();
 
@@ -48,11 +48,13 @@ namespace WebCrawler.TrackerService.Actors.IO
 
         protected CrawlJobStats TotalStats
         {
-            get => RunningStatus.Stats;
+            get => RunningStatus.Stats!;
             set => RunningStatus = RunningStatus.WithStats(value);
         }
 
-        public IStash Stash { get; set; }
+        public IStash Stash { get; set; } = null!;
+
+        public ITimerScheduler Timers { get; set; } = null!;
 
         protected override void PreStart()
         {
@@ -92,7 +94,7 @@ namespace WebCrawler.TrackerService.Actors.IO
             if (Context.Child(CoordinatorRouterName).Equals(ActorRefs.Nobody))
                 CoordinatorRouter =
                     Context.ActorOf(
-                        Props.Create(() => new DownloadCoordinator(Job, Self, DownloadTracker, 50))
+                        Props.Create(() => new DownloadCoordinator(Job, Self, DownloadTracker!, 50))
                             .WithRouter(FromConfig.Instance), CoordinatorRouterName);
             else //in the event of a restart
                 CoordinatorRouter = Context.Child(CoordinatorRouterName);
@@ -211,7 +213,5 @@ namespace WebCrawler.TrackerService.Actors.IO
         }
 
         #endregion
-
-        public ITimerScheduler Timers { get; set; }
     }
 }

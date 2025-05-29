@@ -4,6 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using System;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -11,7 +12,7 @@ namespace WebCrawler.Web.Views.Shared
 {
     public class ErrorModel : PageModel
     {
-        public string RequestId { get; set; }
+        public string RequestId { get; set; } = string.Empty;
 
         public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
 

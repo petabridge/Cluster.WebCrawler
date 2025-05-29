@@ -26,10 +26,9 @@ namespace WebCrawler.Shared.Util
 
         #region Overrides
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            var deadlineObj = obj as Deadline;
-            if (deadlineObj == null)
+            if (obj is not Deadline deadlineObj)
                 return false;
 
             return When.Equals(deadlineObj.When);

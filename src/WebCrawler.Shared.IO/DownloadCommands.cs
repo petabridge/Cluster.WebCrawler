@@ -43,14 +43,14 @@ namespace WebCrawler.Shared.IO
 
         public CrawlDocument Document { get; }
 
-        public bool Equals(DownloadImage other)
+        public bool Equals(DownloadImage? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return Equals(Document, other.Document);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
@@ -92,14 +92,14 @@ namespace WebCrawler.Shared.IO
 
         public CrawlDocument Document { get; }
 
-        public bool Equals(DownloadHtmlDocument other)
+        public bool Equals(DownloadHtmlDocument? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return Equals(Document, other.Document);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

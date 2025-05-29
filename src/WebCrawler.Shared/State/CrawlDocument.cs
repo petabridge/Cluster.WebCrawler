@@ -31,14 +31,14 @@ namespace WebCrawler.Shared.State
 
         public static IEqualityComparer<CrawlDocument> DocumentUriComparer { get; } = new DocumentUriEqualityComparer();
 
-        public bool Equals(CrawlDocument other)
+        public bool Equals(CrawlDocument? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return Equals(DocumentUri, other.DocumentUri);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
@@ -48,12 +48,12 @@ namespace WebCrawler.Shared.State
 
         public override int GetHashCode()
         {
-            return DocumentUri != null ? DocumentUri.GetHashCode() : 0;
+            return DocumentUri?.GetHashCode() ?? 0;
         }
 
         private sealed class DocumentUriEqualityComparer : IEqualityComparer<CrawlDocument>
         {
-            public bool Equals(CrawlDocument x, CrawlDocument y)
+            public bool Equals(CrawlDocument? x, CrawlDocument? y)
             {
                 if (ReferenceEquals(x, y)) return true;
                 if (ReferenceEquals(x, null)) return false;
@@ -64,7 +64,7 @@ namespace WebCrawler.Shared.State
 
             public int GetHashCode(CrawlDocument obj)
             {
-                return obj.DocumentUri != null ? obj.DocumentUri.GetHashCode() : 0;
+                return obj.DocumentUri?.GetHashCode() ?? 0;
             }
         }
     }

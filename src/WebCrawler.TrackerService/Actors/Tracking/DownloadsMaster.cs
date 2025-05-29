@@ -20,23 +20,23 @@ namespace WebCrawler.TrackerService.Actors.Tracking
     {
         public const string DownloadsBroadcastName = "broadcaster";
 
-        protected IActorRef MasterBroadcast;
+        protected IActorRef? MasterBroadcast;
 
         protected int OutstandingAcknowledgments;
-        protected RequestDownloadTrackerFor RequestedTracker;
+        protected RequestDownloadTrackerFor? RequestedTracker;
 
         /// <summary>
         ///     The set of actors responsible for containing download state about a particular domain (defined by
         ///     <see cref="CrawlJob" />)
         /// </summary>
-        protected Dictionary<CrawlJob, IActorRef> Trackers = new Dictionary<CrawlJob, IActorRef>();
+        protected Dictionary<CrawlJob, IActorRef> Trackers = new();
 
         public DownloadsMaster()
         {
             Ready();
         }
 
-        public IStash Stash { get; set; }
+        public IStash Stash { get; set; } = null!;
 
         protected override void PreStart()
         {
@@ -88,12 +88,12 @@ namespace WebCrawler.TrackerService.Actors.Tracking
 
             Receive<GetDownloadTracker>(get => { HandleGetDownloadTracker(get); });
 
-            Receive<ReceiveTimeout>(timeout => Self.Tell(new TrackerNotFound(RequestedTracker.Key)));
+            Receive<ReceiveTimeout>(timeout => Self.Tell(new TrackerNotFound(RequestedTracker!.Key)));
 
             Receive<TrackerNotFound>(notfound =>
             {
                 // check to make sure that this broadcast is for the same job
-                if (notfound.Key.Equals(RequestedTracker.Key))
+                if (notfound.Key.Equals(RequestedTracker!.Key))
                 {
                     OutstandingAcknowledgments--;
 
@@ -135,7 +135,7 @@ namespace WebCrawler.TrackerService.Actors.Tracking
         private void BecomeReadyIfFound(TrackerFound found)
         {
             //check if this was for the job we're currently coordinating
-            if (found.Key.Equals(RequestedTracker.Key))
+            if (found.Key.Equals(RequestedTracker!.Key))
             {
                 RequestedTracker.Originator.Tell(found);
                 Become(Ready);
