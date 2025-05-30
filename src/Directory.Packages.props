@@ -8,12 +8,12 @@
     <PackageVersion Include="Akka.Cluster" Version="$(AkkaVersion)" />
     <PackageVersion Include="Akka.DependencyInjection" Version="$(AkkaVersion)" />
     <PackageVersion Include="Akka.HealthCheck.Cluster" Version="$(AkkaHealthCheckVersion)" />
-    <PackageVersion Include="Akka.HealthCheck.Hosting.Web" Version="1.5.37" />
+    <PackageVersion Include="Akka.HealthCheck.Hosting.Web" Version="$(AkkaHealthCheckVersion)" />
     <PackageVersion Include="Akka.Streams" Version="$(AkkaVersion)" />
     <PackageVersion Include="Akka.Cluster.Hosting" Version="$(AkkaHostingVersion)" />
-    <PackageVersion Include="Akka.Discovery.KubernetesApi" Version="1.5.7" />
+    <PackageVersion Include="Akka.Discovery.KubernetesApi" Version="$(AkkaManagementVersion)" />
     <PackageVersion Include="Akka.HealthCheck.Hosting" Version="$(AkkaHealthCheckVersion)" />
-    <PackageVersion Include="Akka.Management" Version="1.5.7" />
+    <PackageVersion Include="Akka.Management" Version="$(AkkaManagementVersion)" />
     <PackageVersion Include="Petabridge.Cmd.Cluster" Version="$(PetabridgeCmdVersion)" />
     <PackageVersion Include="HtmlAgilityPack" Version="1.11.54" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsVersion)" />
