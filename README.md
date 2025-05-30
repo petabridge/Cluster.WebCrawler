@@ -1,5 +1,9 @@
 # Cluster.WebCrawler
-K8s, DevOps-ified version of the Akka.Cluster WebCrawler code sample.
+K8s, .NET Aspire-d, DevOps-ified version of the Akka.Cluster WebCrawler code sample.
+
+## Running Locally In Container-less Aspire
+
+The solution contains a local development Aspire support. To run the Aspire distributed application, load the solution into your IDE and launch the `WebCrawler.AppHost: http` or the `WebCrawler.AppHost: https` launch profile.
 
 ## Building and Publishing Docker Containers
 This solution uses .NET's built-in container support. The following container images are available:

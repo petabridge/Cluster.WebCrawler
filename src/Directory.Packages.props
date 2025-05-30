@@ -7,6 +7,7 @@
     <PackageVersion Include="Akka" Version="$(AkkaVersion)" />
     <PackageVersion Include="Akka.Cluster" Version="$(AkkaVersion)" />
     <PackageVersion Include="Akka.DependencyInjection" Version="$(AkkaVersion)" />
+    <PackageVersion Include="Akka.Discovery.Azure" Version="1.5.37" />
     <PackageVersion Include="Akka.HealthCheck.Cluster" Version="$(AkkaHealthCheckVersion)" />
     <PackageVersion Include="Akka.HealthCheck.Hosting.Web" Version="$(AkkaHealthCheckVersion)" />
     <PackageVersion Include="Akka.Streams" Version="$(AkkaVersion)" />
@@ -28,6 +29,11 @@
     <PackageVersion Include="xunit" Version="$(XunitVersion)" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.0" />
     <PackageVersion Include="Akka.TestKit.Xunit2" Version="$(AkkaVersion)" />
+  </ItemGroup>
+  <!-- Aspire dependencies -->
+  <ItemGroup>
+    <PackageVersion Include="Aspire.Hosting.AppHost" Version="$(AspireVersion)" />
+    <PackageVersion Include="Aspire.Hosting.Azure.Storage" Version="$(AspireVersion)" />
   </ItemGroup>
   <!-- SourceLink support for all Akka.NET projects -->
   <ItemGroup>
