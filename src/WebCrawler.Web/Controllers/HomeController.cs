@@ -10,7 +10,7 @@ namespace WebCrawler.Web.Controllers
 {
     public class HomeController : Controller
     {
-        public static readonly string Version = typeof(HomeController).Assembly.GetName().Version.ToString();
+        public static readonly string Version = typeof(HomeController).Assembly.GetName().Version!.ToString();
 
         public IActionResult Index()
         {

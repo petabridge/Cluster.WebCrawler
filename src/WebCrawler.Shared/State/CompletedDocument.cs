@@ -15,7 +15,7 @@ namespace WebCrawler.Shared.State
     /// </summary>
     public class CompletedDocument
     {
-        public CompletedDocument(CrawlDocument document, int numBytes, IActorRef completedBy)
+        public CompletedDocument(CrawlDocument document, int numBytes, IActorRef? completedBy)
         {
             CompletedBy = completedBy;
             NumBytes = numBytes;
@@ -26,7 +26,7 @@ namespace WebCrawler.Shared.State
 
         public int NumBytes { get; }
 
-        public IActorRef CompletedBy { get; }
+        public IActorRef? CompletedBy { get; }
     }
 
     /// <summary>
@@ -34,7 +34,7 @@ namespace WebCrawler.Shared.State
     /// </summary>
     public class DiscoveredDocuments
     {
-        public DiscoveredDocuments(IList<CrawlDocument> documents, IActorRef discoveredBy)
+        public DiscoveredDocuments(IList<CrawlDocument> documents, IActorRef? discoveredBy)
         {
             DiscoveredBy = discoveredBy;
             Documents = documents;
@@ -52,6 +52,6 @@ namespace WebCrawler.Shared.State
             get { return Documents.Count(x => x.IsImage); }
         }
 
-        public IActorRef DiscoveredBy { get; }
+        public IActorRef? DiscoveredBy { get; }
     }
 }

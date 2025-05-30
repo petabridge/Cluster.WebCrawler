@@ -32,7 +32,7 @@ namespace WebCrawler.Web.Actors
         }
 
 
-        public IStash Stash { get; set; }
+        public IStash Stash { get; set; } = null!;
 
         private void HubAvailable()
         {

@@ -19,8 +19,10 @@ namespace WebCrawler.Shared.IO
     ///     Can be remote-deployed to other systems.
     ///     Publishes statistics updates to its parent.
     /// </summary>
-    public class DownloadCoordinator : ReceiveActor
+    public class DownloadCoordinator : ReceiveActor, IWithTimers
     {
+        private const string PublishStatTimer = "PublishStatTimer";
+        
         private const int DefaultMaxConcurrentDownloads = 50;
         protected readonly IActorRef Commander;
         protected readonly IActorRef DownloadsTracker;
@@ -29,12 +31,10 @@ namespace WebCrawler.Shared.IO
 
         private readonly ILoggingAdapter _logger = Context.GetLogger();
 
-        private ICancelable _publishStatsTask;
-
-        protected IActorRef DownloaderRouter;
+        protected IActorRef? DownloaderRouter;
 
         protected CrawlJob Job;
-        protected IActorRef ParserRouter;
+        protected IActorRef? ParserRouter;
         protected IActorRef SourceActor;
         protected CrawlJobStats Stats;
 
@@ -46,9 +46,9 @@ namespace WebCrawler.Shared.IO
             MaxConcurrentDownloads = maxConcurrentDownloads;
             Commander = commander;
             Stats = new CrawlJobStats(Job);
-            var selfHtmlSink = Sink.ActorRef<CheckDocuments>(Self, StreamCompleteTick.Instance);
-            var selfDocSink = Sink.ActorRef<CompletedDocument>(Self, StreamCompleteTick.Instance);
-            var selfImgSink = Sink.ActorRef<CompletedDocument>(Self, StreamCompleteTick.Instance);
+            var selfHtmlSink = Sink.ActorRef<CheckDocuments>(Self, StreamCompleteTick.Instance, ex => new StreamFailedTick(ex));
+            var selfDocSink = Sink.ActorRef<CompletedDocument>(Self, StreamCompleteTick.Instance, ex => new StreamFailedTick(ex));
+            var selfImgSink = Sink.ActorRef<CompletedDocument>(Self, StreamCompleteTick.Instance, ex => new StreamFailedTick(ex));
             var htmlFlow = Flow.Create<CrawlDocument>().Via(DownloadFlow.SelectDocType())
                 .Throttle(30, TimeSpan.FromSeconds(5), 100, ThrottleMode.Shaping)
                 .Via(DownloadFlow.ProcessHtmlDownloadFor(DefaultMaxConcurrentDownloads, HttpClientFactory.GetClient()));
@@ -95,30 +95,18 @@ namespace WebCrawler.Shared.IO
             Receiving();
         }
 
+        public ITimerScheduler Timers { get; set; } = null!;
+
         protected override void PreStart()
         {
             // Schedule regular stats updates
-            _publishStatsTask = new Cancelable(Context.System.Scheduler);
-            Context.System.Scheduler.ScheduleTellRepeatedly(TimeSpan.FromMilliseconds(250),
-                TimeSpan.FromMilliseconds(250), Self, PublishStatsTick.Instance, Self, _publishStatsTask);
+            Timers.StartPeriodicTimer(PublishStatTimer, PublishStatsTick.Instance, TimeSpan.FromMilliseconds(250), TimeSpan.FromMilliseconds(250), Self);
         }
 
         protected override void PreRestart(Exception reason, object message)
         {
             //don't dispose of children
             PostStop();
-        }
-
-        protected override void PostStop()
-        {
-            try
-            {
-                //cancel the regularly scheduled task
-                _publishStatsTask.Cancel();
-            }
-            catch
-            {
-            }
         }
 
         private void Receiving()
@@ -165,6 +153,8 @@ namespace WebCrawler.Shared.IO
             });
 
             Receive<StreamCompleteTick>(_ => { _logger.Info("Stream has completed. No more messages to process."); });
+            
+            Receive<StreamFailedTick>(f => { _logger.Warning(f.Cause, "Stream has failed. No more messages to process."); });
         }
 
         #region Constants
@@ -196,6 +186,8 @@ namespace WebCrawler.Shared.IO
             {
             }
         }
+
+        public record StreamFailedTick(Exception Cause);
 
         #endregion
     }

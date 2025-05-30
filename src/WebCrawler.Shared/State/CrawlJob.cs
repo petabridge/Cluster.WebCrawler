@@ -35,14 +35,14 @@ namespace WebCrawler.Shared.State
 
         #region Equality
 
-        public bool Equals(CrawlJob other)
+        public bool Equals(CrawlJob? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return Equals(Root, other.Root);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
@@ -52,7 +52,7 @@ namespace WebCrawler.Shared.State
 
         public override int GetHashCode()
         {
-            return Root != null ? Root.GetHashCode() : 0;
+            return Root?.GetHashCode() ?? 0;
         }
 
         #endregion

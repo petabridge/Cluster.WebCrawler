@@ -22,8 +22,8 @@ namespace WebCrawler.TrackerService.Actors
     {
         public const string MasterBroadcastName = "broadcaster";
 
-        protected IActorRef ApiBroadcaster;
-        protected IStartJobV1 JobToStart;
+        protected IActorRef? ApiBroadcaster;
+        protected IStartJobV1? JobToStart;
         protected int OutstandingAcknowledgements;
 
         public ApiMaster()
@@ -31,7 +31,7 @@ namespace WebCrawler.TrackerService.Actors
             Ready();
         }
 
-        public IStash Stash { get; set; }
+        public IStash Stash { get; set; } = null!;
 
         protected override void PreStart()
         {
@@ -77,7 +77,7 @@ namespace WebCrawler.TrackerService.Actors
 
             Receive<JobFound>(jobFound =>
             {
-                if (jobFound.Key.Equals(JobToStart.Job))
+                if (jobFound.Key.Equals(JobToStart!.Job))
                 {
                     jobFound.CrawlMaster.Tell(new SubscribeToJob(JobToStart.Job, JobToStart.Requestor));
                     BecomeReady();
@@ -85,11 +85,11 @@ namespace WebCrawler.TrackerService.Actors
             });
 
             //treat as a "not found" message
-            Receive<ReceiveTimeout>(timeout => ApiBroadcaster.Tell(new JobNotFound(JobToStart.Job)));
+            Receive<ReceiveTimeout>(timeout => ApiBroadcaster.Tell(new JobNotFound(JobToStart!.Job)));
 
             Receive<JobNotFound>(notFound =>
             {
-                if (notFound.Key.Equals(JobToStart.Job))
+                if (notFound.Key.Equals(JobToStart!.Job))
                 {
                     OutstandingAcknowledgements--;
                     if (OutstandingAcknowledgements <= 0)

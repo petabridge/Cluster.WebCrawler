@@ -16,7 +16,7 @@ namespace WebCrawler.Shared.IO.Messages
     /// </summary>
     public class ProcessDocuments
     {
-        public ProcessDocuments(IList<CrawlDocument> documents, IActorRef assigned)
+        public ProcessDocuments(IList<CrawlDocument> documents, IActorRef? assigned)
         {
             Assigned = assigned;
             Documents = documents;
@@ -37,6 +37,6 @@ namespace WebCrawler.Shared.IO.Messages
         /// <summary>
         ///     Reference to the actor who should take on the cleared documents
         /// </summary>
-        public IActorRef Assigned { get; }
+        public IActorRef? Assigned { get; }
     }
 }
