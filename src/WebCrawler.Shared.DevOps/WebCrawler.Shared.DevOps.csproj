@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Akka.Cluster.Hosting" />
+    <PackageReference Include="Akka.Discovery.Azure" />
     <PackageReference Include="Akka.Discovery.KubernetesApi" />
     <PackageReference Include="Akka.HealthCheck.Hosting" />
     <PackageReference Include="Akka.Management" />

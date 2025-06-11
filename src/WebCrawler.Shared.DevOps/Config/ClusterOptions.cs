@@ -16,5 +16,6 @@ public class ClusterOptions
     public DiscoveryOptions? Discovery { get; set; }
     public int? ReadinessPort { get; set; }
     public int? PbmPort { get; set; }
+    public int? ManagementPort { get; set; }
     public bool IsDocker { get; set; } = false;
 }

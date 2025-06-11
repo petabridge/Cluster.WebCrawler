@@ -31,7 +31,7 @@ namespace WebCrawler.Web
     {
         public static async Task Main(string[] args)
         {
-            var webBuilder = WebApplication.CreateBuilder();
+            var webBuilder = WebApplication.CreateBuilder(args);
 
             webBuilder.Configuration.AddEnvironmentVariables();
             webBuilder.WebHost

@@ -52,6 +52,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infrastructure", "infrastru
 		k8s\environment\configs\k8s-rbac.yaml = k8s\environment\configs\k8s-rbac.yaml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebCrawler.AppHost", "src\WebCrawler.AppHost\WebCrawler.AppHost.csproj", "{BD2A8C31-15C3-4AC9-A055-26FAAA717C67}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,6 +88,10 @@ Global
 		{FED11EA4-D0F5-4B7D-9696-135E61ED3186}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FED11EA4-D0F5-4B7D-9696-135E61ED3186}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FED11EA4-D0F5-4B7D-9696-135E61ED3186}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD2A8C31-15C3-4AC9-A055-26FAAA717C67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD2A8C31-15C3-4AC9-A055-26FAAA717C67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD2A8C31-15C3-4AC9-A055-26FAAA717C67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD2A8C31-15C3-4AC9-A055-26FAAA717C67}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

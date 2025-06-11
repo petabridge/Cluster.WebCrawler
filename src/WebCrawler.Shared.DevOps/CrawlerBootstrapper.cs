@@ -12,6 +12,7 @@ using Akka.Actor;
 using Akka.Cluster.Hosting;
 using Akka.Cluster.Hosting.SBR;
 using Akka.Configuration;
+using Akka.Discovery.Azure;
 using Akka.Discovery.KubernetesApi;
 using Akka.HealthCheck.Hosting;
 using Akka.Hosting;
@@ -47,7 +48,7 @@ namespace WebCrawler.Shared.DevOps
 
             var options = GetEnvironmentVariables(config);
             // Clear seed nodes if we're using Config or Kubernetes Discovery
-            if (options.StartupMethod is StartupMethod.ConfigDiscovery or StartupMethod.KubernetesDiscovery )
+            if (options.StartupMethod is StartupMethod.ConfigDiscovery or StartupMethod.KubernetesDiscovery or StartupMethod.AzureDiscovery)
             {
                 clusterOptions.SeedNodes = null;
                 options.Seeds = null;
@@ -55,7 +56,7 @@ namespace WebCrawler.Shared.DevOps
             
             // Setup remoting
             // Reads environment variable CLUSTER__PORT
-            if (options.Port is { })
+            if (options.Port is not null)
             {
                 Console.WriteLine($"From environment: PORT: {options.Port}");
                 remoteOptions.Port = options.Port;
@@ -66,7 +67,7 @@ namespace WebCrawler.Shared.DevOps
             }
 
             // Reads environment variable CLUSTER__IP
-            if (options.Ip is { })
+            if (options.Ip is not null)
             {
                 var ip = options.Ip.Trim();
                 remoteOptions.PublicHostName = ip;
@@ -84,7 +85,7 @@ namespace WebCrawler.Shared.DevOps
                 remoteOptions.PublicHostName = "localhost";
             }
 
-            if (options.Seeds is { })
+            if (options.Seeds is not null)
             {
                 var seeds = string.Join(",", options.Seeds.Select(s => s.ToHocon()));
                 clusterOptions.SeedNodes = options.Seeds;
@@ -95,7 +96,18 @@ namespace WebCrawler.Shared.DevOps
                 Console.WriteLine($"From environment: SEEDS: NULL, using seeds: [{string.Join(", ", clusterOptions.SeedNodes ?? new []{ "" })}]");
             }
 
-            if (options.ReadinessPort is { })
+            var managementPort = 8558;
+            if (options.ManagementPort is not null)
+            {
+                managementPort = options.ManagementPort.Value;
+                Console.WriteLine($"From environment: MANAGEMENTPORT: [{managementPort}]");
+            }
+            else
+            {
+                Console.WriteLine($"From environment: MANAGEMENTPORT NULL, defaulting to: {managementPort}");
+            }
+
+            if (options.ReadinessPort is not null)
             {
                 readinessPort = options.ReadinessPort.Value;
                 Console.WriteLine($"From environment: READINESSPORT: [{readinessPort}]");
@@ -105,7 +117,7 @@ namespace WebCrawler.Shared.DevOps
                 Console.WriteLine($"From environment: READINESSPORT NULL, defaulting to: {readinessPort}");
             }
 
-            if (options.PbmPort is { })
+            if (options.PbmPort is not null)
             {
                 pbmPort = options.PbmPort.Value;
                 Console.WriteLine($"From environment: PBMPORT: [{pbmPort}]");
@@ -117,23 +129,15 @@ namespace WebCrawler.Shared.DevOps
             
             #endregion
 
-            var cmdHocon = @$"
-# See petabridge.cmd configuration options here: https://cmd.petabridge.com/articles/install/host-configuration.html
-petabridge.cmd {{
-	# default IP address used to listen for incoming petabridge.cmd client connections
-	# should be a safe default as it listens on 'all network interfaces'.
-    host = ""0.0.0.0""
-
-    # default port number used to listen for incoming petabridge.cmd client connections
-    port = {pbmPort}
-}}";
-            
             builder
-                .AddHocon(cmdHocon, HoconAddMode.Prepend)
                 .AddHocon(config.GetSection("Akka"), HoconAddMode.Prepend)
                 .WithRemoting(remoteOptions)
                 .WithClustering(clusterOptions)
-                .AddPetabridgeCmd(pbm =>
+                .AddPetabridgeCmd(new PetabridgeCmdOptions
+                {
+                    Host = "0.0.0.0",
+                    Port = pbmPort
+                }, pbm =>
                 {
                     // enable cluster management commands
                     pbm.RegisterCommandPalette(ClusterCommands.Instance); 
@@ -169,15 +173,16 @@ petabridge.cmd {{
                 builder.WithAkkaManagement(setup =>
                 {
                     setup.Http.HostName = options.Ip ?? Dns.GetHostName();
-                    setup.Http.Port = 8558;
+                    setup.Http.Port = managementPort;
                     setup.Http.BindHostName = "0.0.0.0";
-                    setup.Http.BindPort = 8558;
+                    setup.Http.BindPort = managementPort;
                 });
                 
                 // Add Akka.Management.Cluster.Bootstrap support
                 builder.WithClusterBootstrap(setup =>
                 {
                     setup.ContactPointDiscovery.ServiceName = options.Discovery.ServiceName;
+                    setup.ContactPointDiscovery.RequiredContactPointsNr = 3;
                 }, autoStart: true);
                 
                 var configOptions = options.Discovery;
@@ -197,6 +202,44 @@ petabridge.cmd {{
             }
             #endregion
 
+            #region Azure discovery setup
+
+            if (options.StartupMethod is StartupMethod.AzureDiscovery)
+            {
+                Console.WriteLine("From environment: Forming cluster using Akka.Discovery.Azure");
+                
+                builder.WithAkkaManagement(setup =>
+                {
+                    setup.Http.HostName = options.Ip ?? "localhost";
+                    setup.Http.Port = managementPort;
+                    setup.Http.BindHostName = "0.0.0.0";
+                    setup.Http.BindPort = managementPort;
+                });
+                
+                // Add Akka.Management.Cluster.Bootstrap support
+                var connectionString = config.GetConnectionString("azure-tables");
+                builder
+                    .WithClusterBootstrap(setup =>
+                    {
+                        setup.ContactPointDiscovery.RequiredContactPointsNr = 3;
+                        setup.ContactPointDiscovery.StableMargin = TimeSpan.FromSeconds(5);
+                        setup.ContactPointDiscovery.ContactWithAllContactPoints = true;
+                        setup.ContactPointDiscovery.ServiceName = options.Discovery.ServiceName;
+                        setup.ContactPoint.FilterOnFallbackPort = false;
+                    }, autoStart: true)
+                    .WithAzureDiscovery(opt =>
+                    {
+                        opt.ConnectionString = connectionString;
+                        opt.ServiceName = options.Discovery.ServiceName;
+                        opt.Port = managementPort;
+                    })
+                    .AddHocon(AzureDiscovery.DefaultConfiguration(), HoconAddMode.Append);
+                Console.WriteLine($"From environment: Akka.Discovery.Azure Service Name: {options.Discovery.ServiceName}");
+                return builder;
+            }
+            
+            #endregion
+            
             #region Kubernetes discovery setup
             if (options.StartupMethod is not StartupMethod.KubernetesDiscovery)
                 throw new ConfigurationException($"From environment: Unknown startup method: {options.StartupMethod}");
@@ -206,7 +249,7 @@ petabridge.cmd {{
             builder.WithAkkaManagement(setup =>
             {
                 setup.Http.HostName = "";
-                setup.Http.Port = 8558;
+                setup.Http.Port = managementPort;
             });
                 
             // Add Akka.Management.Cluster.Bootstrap support

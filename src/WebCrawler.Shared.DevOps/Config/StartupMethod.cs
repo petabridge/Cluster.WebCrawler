@@ -11,5 +11,6 @@ public enum StartupMethod
 {
     SeedNodes,
     ConfigDiscovery,
-    KubernetesDiscovery
+    KubernetesDiscovery,
+    AzureDiscovery
 }
