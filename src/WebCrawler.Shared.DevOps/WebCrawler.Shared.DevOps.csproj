@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Akka.Cluster" VersionOverride="1.5.65" />
     <PackageReference Include="Akka.Cluster.Hosting" />
     <PackageReference Include="Akka.Discovery.Azure" />
     <PackageReference Include="Akka.Discovery.KubernetesApi" />
