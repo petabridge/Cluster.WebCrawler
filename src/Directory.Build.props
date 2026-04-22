@@ -27,7 +27,7 @@ Migrated all Docker images and services to use .NET 9</PackageReleaseNotes>
     <NetCoreVersion>net9.0</NetCoreVersion>
     <NetLibraryVersion>netstandard2.1</NetLibraryVersion>
     <MicrosoftExtensionsVersion>9.0.0</MicrosoftExtensionsVersion>
-    <AspireVersion>9.3.0</AspireVersion>
+    <AspireVersion>13.2.3</AspireVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="ContainerSettings" Condition=" '$(CI)' == 'false' OR '$(CI)' == '' ">
