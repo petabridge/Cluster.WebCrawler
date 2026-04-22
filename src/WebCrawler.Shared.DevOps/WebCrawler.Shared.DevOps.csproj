@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Akka.Cluster.Hosting" />
+    <PackageReference Include="Akka.DependencyInjection" VersionOverride="1.5.65" />
     <PackageReference Include="Akka.Discovery.Azure" />
     <PackageReference Include="Akka.Discovery.KubernetesApi" />
     <PackageReference Include="Akka.HealthCheck.Hosting" />
