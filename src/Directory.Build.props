@@ -19,7 +19,7 @@ Migrated all Docker images and services to use .NET 9</PackageReleaseNotes>
   <PropertyGroup>
     <XunitVersion>2.9.2</XunitVersion>
     <AkkaVersion>1.5.42</AkkaVersion>
-    <AkkaManagementVersion>1.5.37</AkkaManagementVersion>
+    <AkkaManagementVersion>1.5.65</AkkaManagementVersion>
     <AkkaHostingVersion>1.5.42</AkkaHostingVersion>
     <HoconVersion>2.0.4</HoconVersion>
     <AkkaHealthCheckVersion>1.5.37</AkkaHealthCheckVersion>
